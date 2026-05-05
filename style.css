@@ -1,0 +1,212 @@
+/* Global Styles & Theme */
+body {
+    background-color: #020617;
+    color: #e2e8f0;
+    font-family: 'Outfit', sans-serif;
+    margin: 0;
+    padding: 0;
+    line-height: 1.6;
+}
+
+/* Glassmorphism Components */
+.glass-card {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    border-color: rgba(99, 102, 241, 0.3);
+}
+
+.gradient-text {
+    background: linear-gradient(135deg, #818cf8 0%, #f43f5e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Sidebar Navigation */
+.sidebar {
+    width: 320px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: #0f172a;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    overflow-y: auto;
+    padding: 2.5rem 1.5rem;
+    z-index: 50;
+    scrollbar-width: thin;
+    scrollbar-color: #334155 transparent;
+}
+
+.sidebar::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 10px;
+}
+
+.sidebar-header {
+    margin-bottom: 2.5rem;
+}
+
+.sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    color: white;
+}
+
+.nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.925rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.nav-item:hover {
+    background: rgba(99, 102, 241, 0.1);
+    color: #818cf8;
+}
+
+.nav-item.active {
+    background: rgba(99, 102, 241, 0.1);
+    color: white;
+    border-color: rgba(99, 102, 241, 0.2);
+}
+
+.nav-number {
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: rgba(255, 255, 255, 0.05);
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    margin-right: 12px;
+    color: #64748b;
+}
+
+.nav-item.active .nav-number {
+    background: #6366f1;
+    color: white;
+}
+
+/* Layout */
+.main-content {
+    margin-left: 320px;
+    padding: 3rem 4rem;
+    min-height: 100vh;
+}
+
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 1.5rem;
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding: 2rem 1.5rem;
+    }
+
+    .nav-list {
+        flex-direction: row;
+        overflow-x: auto;
+        padding-bottom: 1rem;
+    }
+
+    .nav-item {
+        white-space: nowrap;
+    }
+}
+
+/* Dark Theme Overrides for Legacy Light Theme Classes */
+.text-slate-900,
+.text-slate-800,
+.text-neutral-900,
+.text-slate-950 {
+    color: #f8fafc !important;
+}
+
+.text-slate-700,
+.text-slate-600,
+.text-slate-500,
+.text-neutral-600 {
+    color: #cbd5e1 !important;
+}
+
+.bg-white {
+    background-color: rgba(30, 41, 59, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.bg-slate-50,
+.bg-teal-50,
+.bg-brand-50,
+.bg-indigo-50 {
+    background-color: rgba(15, 23, 42, 0.5) !important;
+}
+
+.bg-brand-100,
+.bg-teal-100,
+.bg-indigo-100 {
+    background-color: rgba(99, 102, 241, 0.2) !important;
+    color: #818cf8 !important;
+}
+
+.text-brand-700,
+.text-brand-600,
+.text-teal-700,
+.text-indigo-700 {
+    color: #818cf8 !important;
+}
+
+.border-slate-200,
+.border-neutral-200 {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.shadow-sm,
+.shadow-md {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Code block customization */
+pre {
+    background: #020617 !important;
+    border-radius: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+code {
+    font-family: 'JetBrains Mono', monospace !important;
+}

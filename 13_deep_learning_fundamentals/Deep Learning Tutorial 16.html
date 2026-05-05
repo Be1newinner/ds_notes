@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            900: '#1e1b4b',
+                        },
+                        accent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <title>TensorBoard: The Visual Lab | Deep Learning Guide</title>
+</head>
+
+<body class="antialiased">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item active">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <header class="w-full py-12 px-6 lg:py-20 bg-white border-b border-gray-100">
+            <div class="max-w-4xl mx-auto text-center">
+                <span class="text-primary-600 font-semibold tracking-widest uppercase text-sm mb-4 block">Experimental
+                    Observability</span>
+                <h1 class="text-4xl lg:text-5xl font-display font-bold text-neutral-900 tracking-tight">TensorBoard: The
+                    <span class="text-primary-600">Visual Lab</span></h1>
+                <p class="mt-6 text-gray-500 text-lg max-w-2xl mx-auto">
+                    Moving beyond raw logs to interactive profiling, embedding visualization, and hyperparameter tuning.
+                </p>
+            </div>
+        </header>
+
+        <main class="max-w-4xl mx-auto px-6 py-12 lg:py-16 pb-24">
+
+            <!-- Executive Summary -->
+            <section class="mb-16">
+                <div class="bg-primary-50 border-l-4 border-primary-600 p-8 rounded-r-xl">
+                    <h2 class="text-2xl font-display font-bold text-neutral-900 mb-4">Executive Summary</h2>
+                    <p class="text-neutral-800 text-lg">
+                        TensorBoard is not just a graphing tool—it is a full-stack debugging dashboard. It allows you to
+                        peer into the high-dimensional space of your weights, profile hardware bottlenecks, and compare
+                        hundreds of experiments side-by-side.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Advanced Features -->
+            <section class="mb-16">
+                <h2 class="text-2xl font-display font-bold text-neutral-900 mb-8">Advanced Observability Capabilities
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Profiling -->
+                    <div class="p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <h3 class="font-bold text-primary-600 mb-2 text-sm uppercase">1. Hardware Profiler</h3>
+                        <p class="text-xs text-gray-500">Identifies if your CPU is bottlenecking your GPU. Shows "Input
+                            Pipeline" delays and kernel execution times.</p>
+                    </div>
+                    <!-- Projector -->
+                    <div class="p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <h3 class="font-bold text-primary-600 mb-2 text-sm uppercase">2. Embedding Projector</h3>
+                        <p class="text-xs text-gray-500">Visualizes high-dimensional vectors (like word embeddings) in
+                            3D using PCA or t-SNE algorithms.</p>
+                    </div>
+                    <!-- HParams -->
+                    <div class="p-6 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                        <h3 class="font-bold text-primary-600 mb-2 text-sm uppercase">3. HParams Dashboard</h3>
+                        <p class="text-xs text-gray-500">Parallel coordinate plots that correlate hyperparameter choices
+                            (LR, Batch Size) with final accuracy.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Technical Execution -->
+            <section class="mb-16">
+                <h2 class="text-2xl font-display font-bold text-neutral-900 mb-8">Technical Implementation & Comparisons
+                </h2>
+                <div class="space-y-6">
+                    <div class="p-8 bg-slate-900 rounded-2xl shadow-2xl">
+                        <h3 class="text-white font-bold mb-4">Tracking Multiple Experiments</h3>
+                        <pre class="font-mono text-sm text-blue-300"><code># Strategy: Use timestamped subdirectories
+import datetime
+
+log_dir = "logs/fit/" + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")
+tensorboard_callback = tf.keras.callbacks.TensorBoard(
+    log_dir=log_dir, 
+    histogram_freq=1,
+    profile_batch='500,520' # Trace hardware performance
+)
+
+model.fit(train_data, callbacks=[tensorboard_callback])</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Recall -->
+            <section class="pb-20">
+                <div class="bg-primary-950 rounded-3xl p-12 text-white">
+                    <h2 class="text-3xl font-display font-bold mb-8">Active Recall Checkpoint</h2>
+                    <div class="space-y-6">
+                        <div class="p-6 bg-white/5 rounded-xl border border-white/10">
+                            <p class="font-bold">The VRAM Question</p>
+                            <p class="text-slate-400 text-sm">Why can high-frequency histogram logging (<code
+                                    class="text-primary-600">histogram_freq=1</code>) sometimes crash a training job or
+                                slow it down significantly?</p>
+                        </div>
+                        <div class="p-6 bg-white/5 rounded-xl border border-white/10">
+                            <p class="font-bold">Optimization Diagnosis</p>
+                            <p class="text-slate-400 text-sm italic">If your Loss curve in TensorBoard is oscillating
+                                wildly (massive zig-zags), which hyperparameter should you likely adjust first?</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

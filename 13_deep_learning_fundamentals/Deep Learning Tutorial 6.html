@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            900: '#1e1b4b',
+                        },
+                        accent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <title>Deep Learning Frameworks | Technical Analysis</title>
+</head>
+
+<body class="antialiased">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item active">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <header class="py-20 px-6 text-center lg:text-left max-w-4xl mx-auto">
+            <div
+                class="inline-block px-3 py-1 mb-4 text-xs font-semibold tracking-wider text-brand-700 uppercase bg-brand-100 rounded-full">
+                Technical Ecosystem
+            </div>
+            <h1 class="text-4xl lg:text-6xl font-bold font-display text-neutral-900 tracking-tight mb-6">
+                The Framework <span class="text-brand-600">Evolution</span>
+            </h1>
+            <p class="text-xl text-slate-500 max-w-2xl leading-relaxed">
+                From Theano to Keras 3.0: Understanding the shift from library-specific APIs to unified backend-agnostic
+                deep learning.
+            </p>
+        </header>
+
+        <main class="max-w-4xl mx-auto px-6 pb-24">
+
+            <!-- Executive Summary -->
+            <section class="mb-16">
+                <div class="bg-white p-8 rounded-3xl border-l-4 border-l-brand-500 shadow-sm">
+                    <h2 class="text-2xl font-bold font-display text-neutral-900 mb-4">Executive Summary</h2>
+                    <p class="text-slate-700 leading-relaxed text-lg italic">
+                        The choice of framework is no longer about syntax, but about **Execution Models**. We compare
+                        PyTorch's "Define-by-Run" (Eager) approach with TensorFlow's "Define-and-Run" (Graph) approach,
+                        and how Keras 3.0 bridges this gap by targeting JAX, PyTorch, and TF.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Technical Deep Dive -->
+            <section class="mb-16">
+                <h2 class="text-3xl font-bold font-display text-neutral-900 mb-8">Technical Deep Dive: Architectural
+                    Paradigms</h2>
+
+                <div class="space-y-8">
+                    <!-- Eager vs Graph -->
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <h3 class="text-xl font-bold text-neutral-900 mb-4">1. Imperative (Eager) vs. Declarative
+                            (Graph)</h3>
+                        <p class="text-slate-600 mb-4">How the mathematical engine handles computations determines your
+                            debugging experience and production speed.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <div class="p-4 bg-slate-50 rounded-xl">
+                                <p class="font-bold text-brand-600 mb-1">Imperative (PyTorch)</p>
+                                <p class="text-xs text-slate-500">Calculations happen as lines of code run. Easy to
+                                    debug with Python's pdb. "Define-by-Run."</p>
+                            </div>
+                            <div class="p-4 bg-slate-900 rounded-xl">
+                                <p class="font-bold text-slate-200 mb-1">Declarative (TensorFlow 1.x / JAX)</p>
+                                <p class="text-xs text-slate-400">Builds a static "Graph" first, then executes it. Hard
+                                    to debug but highly optimizable for hardware.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Keras 3.0 -->
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <h3 class="text-xl font-bold text-neutral-900 mb-4">2. The Multi-Backend Revolution (Keras 3.0)
+                        </h3>
+                        <p class="text-slate-600">Keras 3.0 is a complete rewrite that abstracts the backend engine. You
+                            can now:</p>
+                        <ul class="mt-4 space-y-2 text-sm text-slate-600">
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span> Write a model in Keras and
+                                train it using <strong>JAX</strong> for XLA speed.</li>
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span> Use the same code but switch
+                                to <strong>PyTorch</strong> to leverage the Torch ecosystem.</li>
+                            <li class="flex items-center gap-2"><span
+                                    class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span> Deploy on mobile using
+                                <strong>TFLite</strong> by switching to the TensorFlow backend.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recall Checkpoint -->
+            <section class="mb-24">
+                <div class="bg-neutral-900 rounded-[2.5rem] p-12 text-white">
+                    <h2 class="text-3xl font-bold font-display mb-10">Active Recall Checkpoint</h2>
+                    <div class="space-y-8">
+                        <div class="flex gap-5">
+                            <span
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-brand-300">1</span>
+                            <div class="pt-1.5">
+                                <p class="text-xl font-medium">Engine vs. API</p>
+                                <p class="text-slate-400 mt-2 text-sm italic">Explain the analogy: "Keras is to
+                                    TensorFlow as the User Interface is to the Operating System."</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-5">
+                            <span
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-brand-300">2</span>
+                            <div class="pt-1.5">
+                                <p class="text-xl font-medium">JAX's Edge</p>
+                                <p class="text-slate-400 mt-2 text-sm italic">Why would a developer use Keras 3.0 with a
+                                    JAX backend for training, but perhaps switch back to PyTorch for research
+                                    experimentation?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

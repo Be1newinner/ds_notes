@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            900: '#1e1b4b',
+                        },
+                        accent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <title>Deep Learning Math: Derivatives Study Guide</title>
+</head>
+
+<body class="antialiased">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item active">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <main class="container mx-auto px-6 py-12 md:py-20 max-w-4xl">
+
+            <header class="mb-16">
+                <div
+                    class="flex items-center space-x-2 text-brand-600 font-semibold uppercase tracking-widest text-xs mb-4">
+                    <span class="px-2 py-1 bg-brand-100 rounded">Study Guide</span>
+                    <span>•</span>
+                    <span>Calculus for Deep Learning</span>
+                </div>
+                <h1
+                    class="text-4xl md:text-6xl font-display font-extrabold text-slate-900 tracking-tight leading-tight mb-6">
+                    Understanding <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-indigo-600">Derivatives</span>
+                </h1>
+            </header>
+
+            <!-- Executive Summary -->
+            <section class="mb-12 glass-card rounded-3xl p-8 md:p-10">
+                <h2 class="text-2xl font-display font-bold text-slate-900 section-header">Executive Summary</h2>
+                <p class="text-lg leading-relaxed text-slate-700">
+                    Derivatives are the backbone of optimization. This guide explains how we use <strong>Partial
+                        Derivatives</strong> and the <strong>Chain Rule</strong> to navigate the complex
+                    multi-dimensional error landscapes of neural networks.
+                </p>
+            </section>
+
+            <!-- Technical Deep Dive -->
+            <section class="mb-16">
+                <h2 class="text-2xl font-display font-bold text-slate-900 section-header">Technical Deep Dive:
+                    Multi-Variable Calculus</h2>
+
+                <div class="space-y-8">
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <h3 class="text-xl font-bold text-brand-700 mb-4">1. The Gradient Vector ($\nabla f$)</h3>
+                        <p class="text-slate-600 mb-4">In deep learning, we don't just have one derivative. We have a
+                            <strong>Gradient Vector</strong>, which is a vector containing the partial derivatives for
+                            every weight ($w$) and bias ($b$) in the network.</p>
+                        <div class="bg-slate-50 p-4 rounded-xl font-mono text-sm text-brand-800 text-center">
+                            $\nabla f = [\frac{\partial f}{\partial w_1}, \frac{\partial f}{\partial w_2}, \dots,
+                            \frac{\partial f}{\partial b}]$
+                        </div>
+                        <p class="mt-4 text-sm text-slate-500 italic text-center">The gradient points in the direction
+                            of the steepest ASCENT. We move in the opposite direction (Gradient Descent).</p>
+                    </div>
+
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <h3 class="text-xl font-bold text-brand-700 mb-4">2. The Chain Rule: Nested Dependencies</h3>
+                        <p class="text-slate-600 mb-4">Neural networks are layers of nested functions:
+                            $Loss(Activation(WeightedSum(Input)))$. To find the derivative of the Loss with respect to
+                            an early weight, we must multiply the derivatives of each step.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-4 bg-brand-50 rounded-xl border border-brand-100">
+                                <h4 class="font-bold text-xs uppercase mb-2">Example: $y = sin(x^2)$</h4>
+                                <p class="text-xs">Let $u = x^2$ and $y = sin(u)$</p>
+                                <p class="text-xs font-bold mt-2">$\frac{dy}{dx} = \frac{dy}{du} \cdot \frac{du}{dx}$
+                                </p>
+                                <p class="text-xs mt-1">$= cos(u) \cdot 2x = 2x \cdot cos(x^2)$</p>
+                            </div>
+                            <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                                <h4 class="font-bold text-xs uppercase mb-2">Deep Learning Mapping</h4>
+                                <p class="text-xs">$\frac{\partial Loss}{\partial w} = \frac{\partial Loss}{\partial
+                                    Output} \cdot \frac{\partial Output}{\partial w}$</p>
+                                <p class="text-xs mt-4 text-slate-500 italic">This is the heart of Backpropagation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Code Snippets -->
+            <section class="mb-16">
+                <h2 class="text-2xl font-display font-bold text-slate-900 section-header">Numerical vs. Analytical
+                    Derivatives</h2>
+                <div class="code-block rounded-2xl p-8 font-mono text-sm shadow-2xl">
+                    <pre><code><span class="text-slate-400"># Analytical (Exact) using Power Rule</span>
+def derivative_x2(x):
+    return 2 * x
+
+<span class="text-slate-400"># Numerical (Approximation) using small delta</span>
+def numerical_derivative(f, x, h=0.00001):
+    return (f(x + h) - f(x)) / h
+
+def my_func(x):
+    return x**2
+
+print(f"Analytical at 5: {derivative_x2(5)}")
+print(f"Numerical at 5: {numerical_derivative(my_func, 5)}")
+<span class="text-slate-400"># Both will be ~10.0</span></code></pre>
+                </div>
+            </section>
+
+            <!-- Active Recall -->
+            <section class="mb-20">
+                <div class="bg-brand-900 rounded-3xl p-12 text-white shadow-xl relative overflow-hidden">
+                    <h2 class="text-3xl font-display font-bold mb-8">Active Recall Checkpoint</h2>
+                    <div class="space-y-6">
+                        <div class="flex space-x-4">
+                            <span
+                                class="flex-shrink-0 w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center font-bold text-xs">1</span>
+                            <p class="text-lg">If a function has 10,000 weights, how many partial derivatives are in its
+                                Gradient Vector?</p>
+                        </div>
+                        <div class="flex space-x-4">
+                            <span
+                                class="flex-shrink-0 w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center font-bold text-xs">2</span>
+                            <p class="text-lg">Why can't we use a simple linear slope to find the minimum of a neural
+                                network's error surface?</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            900: '#1e1b4b',
+                        },
+                        accent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <title>Technical Study Guide: Loss and Cost Functions</title>
+</head>
+
+<body class="antialiased">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item active">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <header class="relative pt-16 pb-12">
+            <div class="container mx-auto px-6 max-w-4xl">
+                <nav class="mb-8">
+                    <span
+                        class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-brand-100 text-brand-600">
+                        Machine Learning Series
+                    </span>
+                </nav>
+                <h1 class="font-display text-4xl md:text-5xl font-bold text-neutral-900 leading-tight">
+                    Loss vs. <span class="text-brand-500">Cost Functions</span>
+                </h1>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-6 max-w-4xl pb-24">
+
+            <!-- Executive Summary -->
+            <section class="mb-16">
+                <div class="section-divider"></div>
+                <h2 class="font-display text-2xl font-bold text-neutral-900 mb-6">Executive Summary</h2>
+                <div class="glass-card p-8 rounded-2xl shadow-sm border border-slate-200">
+                    <p class="text-slate-700 leading-relaxed">
+                        The loss function measures the "pain" of a single error, while the cost function measures the
+                        "pain" of the entire model. We explore <strong>MSE, Log Loss, and Categorical
+                            Cross-Entropy</strong>, and why choosing the right one is critical for gradient stability.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Technical Deep Dive -->
+            <section class="mb-16">
+                <div class="section-divider"></div>
+                <h2 class="font-display text-2xl font-bold text-neutral-900 mb-8">Technical Deep Dive: Mathematical
+                    Optimization</h2>
+
+                <div class="space-y-8">
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <h3 class="text-xl font-bold text-brand-700 mb-4">1. Mean Squared Error (MSE)</h3>
+                        <p class="text-slate-600 mb-4">MSE is the gold standard for regression. By squaring the error,
+                            we ensure the function is <strong>convex</strong> (bowl-shaped), which guarantees that
+                            Gradient Descent will eventually find the global minimum.</p>
+                        <div class="bg-slate-50 p-4 rounded-xl font-mono text-sm text-center">
+                            $J(w, b) = \frac{1}{2m} \sum_{i=1}^{m} (\hat{y}^{(i)} - y^{(i)})^2$
+                        </div>
+                    </div>
+
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <h3 class="text-xl font-bold text-brand-700 mb-4">2. Binary Cross-Entropy (Log Loss)</h3>
+                        <p class="text-slate-600 mb-4">Why not use MSE for classification? Because if we use a Sigmoid
+                            activation, MSE results in a <strong>non-convex</strong> cost function with many local
+                            minima. Log Loss restores convexity for classification.</p>
+                        <div class="bg-brand-50 p-4 rounded-xl font-mono text-sm text-center">
+                            $Loss = -(y \log(\hat{y}) + (1-y) \log(1-\hat{y}))$
+                        </div>
+                    </div>
+
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <h3 class="text-xl font-bold text-brand-700 mb-4">3. Categorical Cross-Entropy</h3>
+                        <p class="text-slate-600 mb-4">Used for multi-class problems (like MNIST). It compares the
+                            predicted probability distribution against the one-hot encoded true labels.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Code Execution -->
+            <section class="mb-16">
+                <div class="section-divider"></div>
+                <h2 class="font-display text-2xl font-bold text-neutral-900 mb-6">Numerical Stability in Code</h2>
+                <div class="bg-neutral-900 rounded-2xl p-8 font-mono text-sm text-slate-300">
+                    <pre><code><span class="text-purple-400">import</span> numpy <span class="text-purple-400">as</span> np
+
+<span class="text-slate-500"># Why we need Epsilon</span>
+y_pred = np.array([<span class="text-orange-400">1.0, 0.0, 0.9</span>]) <span class="text-slate-500"># Perfect 0 or 1 causes log(0) = error</span>
+epsilon = <span class="text-orange-400">1e-15</span>
+
+<span class="text-brand-500"># Clipping ensures we never hit absolute 0 or 1</span>
+y_clipped = np.clip(y_pred, epsilon, <span class="text-orange-400">1</span> - epsilon)
+
+<span class="text-brand-500"># Vectorized MSE Implementation</span>
+<span class="text-purple-400">def</span> <span class="text-blue-400">mse</span>(y_true, y_pred):
+    <span class="text-purple-400">return</span> np.mean(np.square(y_true - y_pred))</code></pre>
+                </div>
+            </section>
+
+            <!-- Recall Checkpoint -->
+            <section class="mb-16">
+                <div class="bg-neutral-900 rounded-3xl p-12 text-white">
+                    <h2 class="text-3xl font-bold font-display mb-8 text-brand-500">Active Recall Checkpoint</h2>
+                    <div class="space-y-6">
+                        <div class="p-6 bg-white/5 rounded-xl border border-white/10">
+                            <p class="font-bold">Convexity</p>
+                            <p class="text-slate-400 text-sm">Why is it dangerous to have a non-convex cost function
+                                during training?</p>
+                        </div>
+                        <div class="p-6 bg-white/5 rounded-xl border border-white/10">
+                            <p class="font-bold">Penalty Magnitude</p>
+                            <p class="text-slate-400 text-sm">If a model is 99% confident that a sample is 'Class A' but
+                                it is actually 'Class B', which function penalizes it more: MAE or Log Loss?</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            900: '#1e1b4b',
+                        },
+                        accent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <title>Study Guide: Gradient Descent Optimization</title>
+</head>
+
+<body class="antialiased">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item active">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <header class="pt-16 pb-12 px-6 bg-white">
+            <div class="max-w-4xl mx-auto">
+                <span
+                    class="inline-block py-1 px-3 mb-4 text-xs font-semibold tracking-wider text-brand-700 uppercase bg-brand-50 rounded-full">
+                    Optimization Theory
+                </span>
+                <h1
+                    class="font-display text-4xl md:text-6xl font-800 text-neutral-900 tracking-tight leading-tight mb-6">
+                    Mastering <span class="text-brand-600">Gradient Descent</span>
+                </h1>
+            </div>
+        </header>
+
+        <main class="max-w-4xl mx-auto px-6 pb-24 space-y-16">
+
+            <!-- Executive Summary -->
+            <section>
+                <div class="glass-card rounded-3xl p-8 md:p-12 shadow-sm">
+                    <div class="section-divider"></div>
+                    <h2 class="font-display text-2xl font-600 mb-6">Executive Summary</h2>
+                    <p class="text-neutral-700 leading-relaxed">
+                        Gradient Descent is the algorithm that makes "Learning" possible. We move from high-level
+                        abstractions to the raw mathematics of **Partial Derivatives** and **Learning Rates**, exploring
+                        why Stochastic and Mini-Batch approaches are preferred for large datasets.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Technical Deep Dive -->
+            <section>
+                <h2 class="font-display text-3xl font-600 mb-8 text-neutral-900">Technical Deep Dive: Variants &
+                    Geography</h2>
+
+                <div class="space-y-8">
+                    <!-- Variants -->
+                    <div class="p-8 bg-white border border-neutral-200 rounded-3xl shadow-sm">
+                        <h3 class="text-xl font-bold text-brand-700 mb-4">1. The Three Primary Variants</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                            <div class="p-4 bg-slate-50 rounded-xl">
+                                <p class="font-bold mb-1">Batch GD</p>
+                                <p class="text-xs text-slate-500">Uses ALL data samples to calculate one gradient.
+                                    Stable but slow for big data.</p>
+                            </div>
+                            <div class="p-4 bg-brand-50 rounded-xl">
+                                <p class="font-bold text-brand-600 mb-1">Stochastic (SGD)</p>
+                                <p class="text-xs text-slate-500">Uses ONE sample per update. Fast and noisy—helps jump
+                                    out of local minima.</p>
+                            </div>
+                            <div class="p-4 bg-slate-50 rounded-xl">
+                                <p class="font-bold mb-1">Mini-Batch</p>
+                                <p class="text-xs text-slate-500">Uses a small subset (e.g., 32 samples). The industry
+                                    standard—balances speed and stability.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Geography -->
+                    <div class="p-8 bg-white border border-neutral-200 rounded-3xl shadow-sm">
+                        <h3 class="text-xl font-bold text-brand-700 mb-4">2. Local Minima vs. Saddle Points</h3>
+                        <p class="text-slate-600 mb-4">In high-dimensional space, we rarely get stuck in true local
+                            minima. Instead, we face **Saddle Points**—where the slope is zero in some directions but
+                            not others. Modern optimizers like **Adam** use Momentum to "push" past these points.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Code Snippet -->
+            <section>
+                <h2 class="font-display text-3xl font-600 mb-8 text-neutral-900">Numpy Implementation: The Core Loop
+                </h2>
+                <div class="bg-neutral-900 rounded-2xl p-8 font-mono text-sm text-slate-300">
+                    <pre><code><span class="text-purple-400">def</span> <span class="text-blue-400">gradient_descent</span>(X, y, epochs, lr):
+    weights = np.ones(X.shape[<span class="text-orange-400">1</span>])
+    bias = <span class="text-orange-400">0</span>
+    n = <span class="text-blue-400">len</span>(y)
+    
+    <span class="text-purple-400">for</span> i <span class="text-purple-400">in</span> <span class="text-blue-400">range</span>(epochs):
+        <span class="text-slate-500"># 1. Forward Pass</span>
+        y_pred = sigmoid(np.dot(X, weights) + bias)
+        
+        <span class="text-slate-500"># 2. Gradient Calculation</span>
+        dw = (<span class="text-orange-400">1</span>/n) * np.dot(X.T, (y_pred - y))
+        db = np.mean(y_pred - y)
+        
+        <span class="text-slate-500"># 3. Parameter Update</span>
+        weights -= lr * dw
+        bias -= lr * db
+    <span class="text-purple-400">return</span> weights, bias</code></pre>
+                </div>
+            </section>
+
+            <!-- Active Recall -->
+            <section>
+                <div class="bg-neutral-950 rounded-3xl p-12 text-white">
+                    <h2 class="text-3xl font-bold font-display mb-8 text-brand-500">Active Recall Checkpoint</h2>
+                    <div class="space-y-6">
+                        <div class="p-6 bg-white/5 rounded-xl border border-white/10">
+                            <p class="font-bold">The Directionality Question</p>
+                            <p class="text-slate-400 text-sm">If the derivative ($\partial L/\partial w$) is POSITIVE,
+                                does that mean the current weight is too high or too low to reach the minimum?</p>
+                        </div>
+                        <div class="p-6 bg-white/5 rounded-xl border border-white/10">
+                            <p class="font-bold">Mini-Batch Advantage</p>
+                            <p class="text-slate-400 text-sm">Why is Mini-Batch GD technically better for hardware (GPU)
+                                utilization compared to Stochastic GD?</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

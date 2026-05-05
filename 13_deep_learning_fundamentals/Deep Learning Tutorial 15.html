@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            900: '#1e1b4b',
+                        },
+                        accent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <title>The Chain Rule & Backpropagation | Master Guide</title>
+</head>
+
+<body class="antialiased">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item active">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <header class="py-16 px-6 text-center bg-white border-b border-slate-200">
+            <h1 class="font-display text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900">
+                Chain Rule & <span class="text-brand-primary">Backpropagation</span>
+            </h1>
+            <p class="mt-4 text-slate-500 font-medium text-lg max-w-2xl mx-auto">
+                The mathematical foundation of deep learning optimization and automatic differentiation.
+            </p>
+        </header>
+
+        <main class="max-w-4xl mx-auto px-6 py-12 pb-24">
+
+            <!-- Executive Summary -->
+            <section class="mb-16">
+                <div class="glass-card p-8 rounded-3xl shadow-sm border border-slate-200">
+                    <div class="section-divider"></div>
+                    <h2 class="text-2xl font-display font-bold text-slate-900 mb-4">Executive Summary</h2>
+                    <p class="text-lg leading-relaxed text-slate-700">
+                        Backpropagation is simply the application of the **Chain Rule** to find the gradient of the loss
+                        function with respect to every weight in a multi-layered network. This allows us to "assign
+                        credit" for error to specific parameters.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Technical Deep Dive -->
+            <section class="mb-16">
+                <h2 class="text-3xl font-display font-bold text-slate-900 mb-8">Technical Deep Dive: The Chain of
+                    Derivatives</h2>
+
+                <div class="space-y-8">
+                    <!-- Decomposition -->
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <h3 class="text-xl font-bold text-brand-primary mb-4">1. Local vs. Global Gradients</h3>
+                        <p class="text-slate-600 mb-4">Each neuron only needs to know its "Local Gradient" (how its
+                            output changes relative to its input). Backprop multiplies this local gradient by the
+                            "Upstream Gradient" flowing back from the error.</p>
+                        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-center font-mono text-sm">
+                            $\frac{\partial Loss}{\partial w} = \underbrace{\frac{\partial Loss}{\partial
+                            y}}_{\text{Upstream}} \times \underbrace{\frac{\partial y}{\partial z}}_{\text{Activation}}
+                            \times \underbrace{\frac{\partial z}{\partial w}}_{\text{Local}}$
+                        </div>
+                    </div>
+
+                    <!-- Vanishing Gradients -->
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <h3 class="text-xl font-bold text-brand-primary mb-4">2. The Danger of Deep Chains</h3>
+                        <p class="text-slate-600 mb-4">In a network with 100 layers, we multiply 100 derivatives
+                            together. If these derivatives are small (like in Sigmoid), the product becomes microscopic
+                            (Vanishing Gradient). If they are large, the product explodes (Exploding Gradient).</p>
+                        <div class="bg-red-50 p-4 rounded-xl border border-red-100 text-red-800 text-sm italic">
+                            This is why modern architectures use **ReLU** and **Skip Connections (ResNets)** to maintain
+                            gradient flow.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Code Snippet -->
+            <section class="mb-16">
+                <h2 class="text-3xl font-display font-bold text-slate-900 mb-6 text-center">Manual Backprop Walkthrough
+                </h2>
+                <div class="bg-neutral-900 rounded-2xl p-8 font-mono text-sm text-slate-300 shadow-2xl">
+                    <pre><code><span class="text-slate-500"># Let L = e^2, e = y_true - y_hat, y_hat = w*x</span>
+x, w, y_true = <span class="text-orange-400">10, 0.5, 7</span>
+
+<span class="text-brand-primary"># Forward Pass</span>
+y_hat = w * x <span class="text-slate-500"># 5.0</span>
+error = y_true - y_hat <span class="text-slate-500"># 2.0</span>
+loss = error**2 <span class="text-slate-500"># 4.0</span>
+
+<span class="text-brand-primary"># Backward Pass (Chain Rule)</span>
+dL_de = <span class="text-orange-400">2</span> * error <span class="text-slate-500"># 4.0</span>
+de_dyhat = -<span class="text-orange-400">1</span>
+dyhat_dw = x <span class="text-slate-500"># 10.0</span>
+
+<span class="text-slate-500"># Final Gradient dL/dw</span>
+dL_dw = dL_de * de_dyhat * dyhat_dw <span class="text-slate-500"># 4.0 * -1 * 10 = -40</span>
+<span class="text-purple-400">print</span>(<span class="text-emerald-400">f"Gradient: {dL_dw}"</span>)</code></pre>
+                </div>
+            </section>
+
+            <!-- Recall Checkpoint -->
+            <section class="mb-16">
+                <div class="bg-neutral-900 rounded-3xl p-12 text-white">
+                    <h2 class="text-3xl font-bold font-display mb-8">Active Recall Checkpoint</h2>
+                    <div class="space-y-6">
+                        <div class="p-6 bg-white/5 rounded-xl border border-white/10">
+                            <p class="font-bold text-brand-secondary">The Gradient Flow</p>
+                            <p class="text-slate-400 text-sm">If one derivative in the chain is zero, what happens to
+                                the gradients of all layers closer to the input?</p>
+                        </div>
+                        <div class="p-6 bg-white/5 rounded-xl border border-white/10">
+                            <p class="font-bold text-brand-secondary">Calculus Intuition</p>
+                            <p class="text-slate-400 text-sm italic">In the chain rule $\frac{dy}{dx} = \frac{dy}{du}
+                                \cdot \frac{du}{dx}$, which part represents the "hidden layer" and which part represents
+                                the "output"?</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

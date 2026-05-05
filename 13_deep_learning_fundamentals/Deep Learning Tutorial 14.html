@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            900: '#1e1b4b',
+                        },
+                        accent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <title>Gradient Descent Variants | Technical Deep Dive</title>
+</head>
+
+<body class="antialiased">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item active">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <header class="sticky top-0 z-50 glass-card py-6 mb-8 px-4 border-b border-slate-200">
+            <div class="max-w-4xl mx-auto text-center">
+                <span class="text-xs font-bold uppercase tracking-widest text-primary mb-2">Computational
+                    Optimization</span>
+                <h1 class="text-3xl md:text-4xl font-display font-bold text-dark tracking-tight">
+                    Batch, SGD, and <span class="text-primary">Mini-Batch</span>
+                </h1>
+            </div>
+        </header>
+
+        <main class="max-w-4xl mx-auto px-4 pb-20 space-y-16">
+
+            <!-- Executive Summary -->
+            <section>
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-100">
+                    <h2 class="text-2xl font-display font-bold text-dark mb-4">Executive Summary</h2>
+                    <p class="text-lg text-slate-600 leading-relaxed">
+                        Choosing the right variant of Gradient Descent determines the speed and quality of training. We
+                        analyze the trade-offs between **Memory (Batch)**, **Noise (SGD)**, and **Hardware Utilization
+                        (Mini-Batch)**.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Technical Comparison Table -->
+            <section>
+                <h2 class="text-2xl font-display font-bold text-dark mb-8">Structural Comparison</h2>
+                <div class="overflow-x-auto rounded-xl border border-slate-200">
+                    <table class="w-full text-left border-collapse bg-white">
+                        <thead class="bg-slate-50 text-slate-600 text-xs uppercase tracking-widest">
+                            <tr>
+                                <th class="p-4 border-b">Feature</th>
+                                <th class="p-4 border-b">Batch GD</th>
+                                <th class="p-4 border-b">Stochastic GD</th>
+                                <th class="p-4 border-b">Mini-Batch GD</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm text-slate-700">
+                            <tr>
+                                <td class="p-4 border-b font-bold">Update Frequency</td>
+                                <td class="p-4 border-b">Once per Epoch</td>
+                                <td class="p-4 border-b">Every Sample</td>
+                                <td class="p-4 border-b">Every Batch</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 border-b font-bold">Memory Usage</td>
+                                <td class="p-4 border-b">Extremely High</td>
+                                <td class="p-4 border-b">Low</td>
+                                <td class="p-4 border-b">Moderate (Configurable)</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 border-b font-bold">Convergence Path</td>
+                                <td class="p-4 border-b text-emerald-600">Smooth & Direct</td>
+                                <td class="p-4 border-b text-red-500">Very Noisy</td>
+                                <td class="p-4 border-b text-blue-500">Relatively Stable</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Technical Deep Dive -->
+            <section>
+                <h2 class="text-2xl font-display font-bold text-dark mb-8">Hardware Utilization & Vectorization</h2>
+                <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                    <h3 class="text-xl font-bold text-primary mb-4">1. Why Mini-Batch Wins</h3>
+                    <p class="text-slate-600 mb-6">Modern CPUs and GPUs are designed for **Matrix Operations**, not
+                        scalar ones. SGD updates one sample at a time, meaning the hardware sits idle waiting for the
+                        next instruction. Batch GD is too big for memory. Mini-Batch fits into the **GPU Memory (VRAM)**
+                        and uses parallelization to process 32-512 samples simultaneously.</p>
+                    <div class="bg-slate-900 p-6 rounded-2xl font-mono text-sm text-slate-300">
+                        # The Sweet Spot: Batch size power of 2 (32, 64, 128)<br />
+                        # Replicates the best of both worlds.
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recall Checkpoint -->
+            <section>
+                <div class="bg-dark rounded-3xl p-12 text-white shadow-xl">
+                    <h2 class="text-3xl font-display font-bold mb-8 text-primary">Active Recall Checkpoint</h2>
+                    <div class="space-y-6">
+                        <div class="p-6 bg-white/5 rounded-xl border border-white/10">
+                            <p class="font-bold">Noise vs. Escape</p>
+                            <p class="text-slate-400 text-sm">Why is the "noise" in SGD sometimes considered a feature
+                                rather than a bug? (Hint: Think about Local Minima).</p>
+                        </div>
+                        <div class="p-6 bg-white/5 rounded-xl border border-white/10">
+                            <p class="font-bold">Numerical Scaling</p>
+                            <p class="text-slate-400 text-sm italic">If one feature is "Annual Income" (0-100,000) and
+                                another is "Years of Experience" (0-40), why will GD struggle to converge without
+                                normalization?</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

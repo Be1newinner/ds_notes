@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            900: '#1e1b4b',
+                        },
+                        accent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <title>MNIST: The Hello World of Deep Learning</title>
+</head>
+
+<body class="antialiased">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item active">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <main class="max-w-6xl mx-auto px-6 py-12">
+
+            <header class="mb-20">
+                <div
+                    class="inline-block px-4 py-1 rounded-full border border-brand-500/30 bg-brand-500/10 text-brand-500 font-semibold text-sm mb-6">
+                    Computer Vision Foundations
+                </div>
+                <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
+                    Deep Dive into <br /><span class="gradient-text">MNIST Classification</span>
+                </h1>
+                <p class="text-xl text-slate-400 max-w-2xl leading-relaxed">
+                    Beyond the code: Understanding the mathematical stability of scaling and the probability mechanics
+                    of Softmax.
+                </p>
+            </header>
+
+            <!-- Executive Summary -->
+            <section class="mb-20">
+                <div class="glass-card p-10 rounded-3xl border-l-4 border-l-brand-500">
+                    <h2 class="text-3xl font-bold mb-6">Executive Summary</h2>
+                    <p class="text-slate-300 leading-relaxed text-lg">
+                        MNIST is the "Drosophila" of machine learning. We don't just "train a model"—we perform **Matrix
+                        Flattening**, **Min-Max Scaling**, and **Categorical Probability Mapping**. This guide covers
+                        why these steps are non-negotiable for convergence.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Technical Deep Dive -->
+            <section class="mb-20">
+                <h2 class="text-3xl font-bold mb-12 flex items-center gap-4">
+                    <span class="h-[2px] w-12 bg-brand-500"></span>
+                    The Mathematical Prerequisites
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Why Scale? -->
+                    <div class="glass-card p-8 rounded-3xl">
+                        <h4 class="text-xl font-bold mb-4 text-white">1. Scaling & Numerical Stability</h4>
+                        <p class="text-slate-400 text-sm mb-4 leading-relaxed">Input pixels range from 0 (Black) to 255
+                            (White). If we feed 255 into a network, the gradients during backpropagation will "explode."
+                            Scaling to **[0, 1]** ensures the weights stay in a manageable range.</p>
+                        <div class="bg-black/50 p-4 rounded-xl font-mono text-xs text-brand-300">
+                            X_scaled = (X - X_min) / (X_max - X_min)
+                        </div>
+                    </div>
+                    <!-- Softmax -->
+                    <div class="glass-card p-8 rounded-3xl">
+                        <h4 class="text-xl font-bold mb-4 text-white">2. Softmax: The Competition Layer</h4>
+                        <p class="text-slate-400 text-sm mb-4 leading-relaxed">The final layer uses Softmax to turn raw
+                            "logits" into probabilities. It forces the output to sum to exactly 1.0, creating a
+                            "winner-takes-all" dynamic among the 10 possible digits.</p>
+                        <div class="bg-black/50 p-4 rounded-xl font-mono text-xs text-accent">
+                            Softmax(z_i) = e^(z_i) / Σ e^(z_j)
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Technical Execution -->
+            <section class="mb-20">
+                <h2 class="text-3xl font-bold mb-12 text-center">Implementation Architecture</h2>
+                <div class="bg-slate-950 p-8 rounded-3xl font-mono text-sm border border-slate-800 shadow-2xl">
+                    <pre
+                        class="text-brand-500"><code><span class="text-slate-500"># The Flattening logic: 28x28 -> 784 1D array</span>
+model = keras.Sequential([
+    keras.layers.Flatten(input_shape=(<span class="text-accent">28</span>, <span class="text-accent">28</span>)), 
+    <span class="text-slate-500"># Hidden layer with ReLU to prevent vanishing gradients</span>
+    keras.layers.Dense(<span class="text-accent">128</span>, activation=<span class="text-brand-500">'relu'</span>), 
+    <span class="text-slate-500"># Output layer with 10 units for 10 digits</span>
+    keras.layers.Dense(<span class="text-accent">10</span>, activation=<span class="text-brand-500">'softmax'</span>)
+])
+
+<span class="text-slate-500"># Why Sparse Categorical Crossentropy?</span>
+<span class="text-slate-500"># Because y_train contains integer labels (e.g., 5) </span>
+<span class="text-slate-500"># instead of one-hot vectors ([0,0,0,0,0,1,0,0,0,0]).</span>
+model.compile(optimizer=<span class="text-brand-500">'adam'</span>, loss=<span class="text-brand-500">'sparse_categorical_crossentropy'</span>)</code></pre>
+                </div>
+            </section>
+
+            <!-- Recall Checkpoint -->
+            <section class="pb-20">
+                <div class="bg-gradient-to-br from-indigo-600 to-brand-900 rounded-[3rem] p-12 shadow-2xl">
+                    <h2 class="text-4xl font-extrabold mb-10 text-white">Active Recall Checkpoint</h2>
+                    <div class="space-y-6">
+                        <div class="p-6 bg-white/10 rounded-2xl border border-white/20">
+                            <p class="font-bold text-white mb-2">Architectural Logic</p>
+                            <p class="text-indigo-200 text-sm">If we added another hidden layer with 512 neurons, would
+                                our model be more accurate or just slower? Explain the risk of
+                                <strong>Overfitting</strong>.</p>
+                        </div>
+                        <div class="p-6 bg-white/10 rounded-2xl border border-white/20">
+                            <p class="font-bold text-white mb-2">Loss vs. Accuracy</p>
+                            <p class="text-indigo-200 text-sm italic">Why do we use "Loss" to train the model instead of
+                                "Accuracy"? (Hint: Is Accuracy differentiable?)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

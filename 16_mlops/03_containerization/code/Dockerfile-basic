@@ -1,0 +1,11 @@
+# 1. Base Image: We start with a lightweight version of Python 3.9
+FROM python:3.9-slim
+
+# 2. Set the working directory inside the container
+WORKDIR /app
+
+# 3. Copy our script from our computer to the container's /app folder
+COPY example-01-basic.py .
+
+# 4. Command to run when the container starts
+CMD ["python", "example-01-basic.py"]

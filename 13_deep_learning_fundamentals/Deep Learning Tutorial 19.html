@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            900: '#1e1b4b',
+                        },
+                        accent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <title>Customer Churn Prediction Guide | AI Web Developer</title>
+</head>
+
+<body class="antialiased">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item active">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <!-- Header -->
+        <header class="w-full py-12 md:py-20 px-6 text-center bg-white border-b border-slate-200">
+            <div class="max-w-4xl mx-auto">
+                <span
+                    class="inline-block px-4 py-1.5 mb-4 text-xs font-bold tracking-widest text-brand-600 uppercase bg-brand-50 rounded-full">
+                    Machine Learning Tutorial
+                </span>
+                <h1 class="text-4xl md:text-6xl font-display font-bold text-slate-900 tracking-tight leading-tight">
+                    Customer Churn Prediction <br /><span class="text-brand-600">Study Guide</span>
+                </h1>
+                <p class="mt-6 text-lg text-slate-500 max-w-2xl mx-auto">
+                    A professional educational resource on building Artificial Neural Networks with Python, Pandas, and
+                    TensorFlow.
+                </p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-4xl mx-auto px-6 py-12 md:py-20">
+
+            <!-- Executive Summary -->
+            <section class="section-anchor mb-16">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="h-8 w-1 bg-brand-600 rounded-full"></div>
+                    <h2 class="text-2xl font-display font-bold text-slate-900">Executive Summary</h2>
+                </div>
+                <div
+                    class="p-8 bg-white rounded-2xl shadow-sm border border-slate-100 italic text-slate-700 leading-relaxed">
+                    This video provides a comprehensive tutorial on predicting customer churn using an Artificial Neural
+                    Network built with Python, Pandas, and TensorFlow. The project covers the full machine learning
+                    lifecycle from data cleaning and visualization to model training and performance evaluation using
+                    metrics like precision and recall.
+                </div>
+            </section>
+
+            <!-- The Why -->
+            <section class="section-anchor mb-16">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="h-8 w-1 bg-brand-600 rounded-full"></div>
+                    <h2 class="text-2xl font-display font-bold text-slate-900">The "Why" (First Principles)</h2>
+                </div>
+                <div class="prose prose-slate max-w-none">
+                    <p class="text-slate-700 mb-4">
+                        Customer churn measures how many customers stop doing business with a company, which is a
+                        critical problem for industries like telecommunications and banking. By predicting which
+                        customers are likely to leave, businesses can take proactive actions to retain them, potentially
+                        saving significant revenue.
+                    </p>
+                    <p class="text-slate-700">
+                        Deep learning models like <strong>Artificial Neural Networks</strong> are effective at
+                        identifying complex patterns in customer behavior data that correlate with churn, allowing for
+                        more nuanced predictions than traditional statistical methods.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Detailed Notes -->
+            <section class="section-anchor mb-16">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="h-8 w-1 bg-brand-600 rounded-full"></div>
+                    <h2 class="text-2xl font-display font-bold text-slate-900">Detailed Step-by-Step Notes</h2>
+                </div>
+                <div class="space-y-6">
+                    <div class="flex gap-4">
+                        <div
+                            class="flex-none w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm">
+                            1</div>
+                        <p class="text-slate-700"><strong class="text-slate-900">Dataset acquisition and initial
+                                exploration:</strong> The Telco Customer Churn dataset is loaded using Pandas to examine
+                            features like tenure, monthly charges, and services used.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div
+                            class="flex-none w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm">
+                            2</div>
+                        <p class="text-slate-700"><strong class="text-slate-900">Data cleaning:</strong> Irrelevant
+                            columns like <code
+                                class="bg-slate-100 px-1.5 py-0.5 rounded text-brand-700 font-mono text-sm">CustomerID</code>
+                            are dropped. Strings in columns like <code
+                                class="bg-slate-100 px-1.5 py-0.5 rounded text-brand-700 font-mono text-sm">TotalCharges</code>
+                            are converted to numeric values, handling empty spaces by coercing errors and dropping null
+                            records.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div
+                            class="flex-none w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm">
+                            3</div>
+                        <p class="text-slate-700"><strong class="text-slate-900">Feature engineering:</strong>
+                            Categorical values with similar meanings, such as "No internet service", are consolidated
+                            into a standard "No" value. Yes and No strings are converted to binary 1 and 0 values.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div
+                            class="flex-none w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm">
+                            4</div>
+                        <p class="text-slate-700"><strong class="text-slate-900">Categorical encoding:</strong>
+                            Multi-category text data, such as contract types and payment methods, are converted into
+                            numerical columns via one-hot encoding using the <code
+                                class="bg-slate-100 px-1.5 py-0.5 rounded text-brand-700 font-mono text-sm">pd.get_dummies</code>
+                            function.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div
+                            class="flex-none w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm">
+                            5</div>
+                        <p class="text-slate-700"><strong class="text-slate-900">Feature scaling:</strong> Continuous
+                            variables such as tenure and monthly charges are scaled to a 0 to 1 range using <code
+                                class="bg-slate-100 px-1.5 py-0.5 rounded text-brand-700 font-mono text-sm">MinMaxScaler</code>
+                            to ensure training stability.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div
+                            class="flex-none w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm">
+                            6</div>
+                        <p class="text-slate-700"><strong class="text-slate-900">Model architecture:</strong> A
+                            sequential model is defined with an input layer matching features, hidden layers with <code
+                                class="bg-slate-100 px-1.5 py-0.5 rounded text-brand-700 font-mono text-sm">ReLU</code>,
+                            and a single-neuron output layer with <code
+                                class="bg-slate-100 px-1.5 py-0.5 rounded text-brand-700 font-mono text-sm">sigmoid</code>
+                            activation.</p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div
+                            class="flex-none w-8 h-8 rounded-full bg-brand-100 text-brand-700 flex items-center justify-center font-bold text-sm">
+                            7</div>
+                        <p class="text-slate-700"><strong class="text-slate-900">Training and evaluation:</strong> The
+                            model is compiled with the <code
+                                class="bg-slate-100 px-1.5 py-0.5 rounded text-brand-700 font-mono text-sm">Adam</code>
+                            optimizer and binary crossentropy loss, validated via confusion matrix and classification
+                            reports.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Highlighted Examples -->
+            <section class="section-anchor mb-16">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="h-8 w-1 bg-brand-600 rounded-full"></div>
+                    <h2 class="text-2xl font-display font-bold text-slate-900">Highlighted Examples</h2>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="p-6 bg-white border border-slate-200 rounded-xl">
+                        <h4 class="font-bold text-brand-700 mb-2">Telecommunications</h4>
+                        <p class="text-sm text-slate-600">A wireless carrier tracking when a user stops their service
+                            and moves to a competitor.</p>
+                    </div>
+                    <div class="p-6 bg-white border border-slate-200 rounded-xl">
+                        <h4 class="font-bold text-brand-700 mb-2">Banking Context</h4>
+                        <p class="text-sm text-slate-600">A financial institution monitoring when a customer closes
+                            their account.</p>
+                    </div>
+                    <div class="p-6 bg-white border border-slate-200 rounded-xl">
+                        <h4 class="font-bold text-brand-700 mb-2">Tenure Visualization</h4>
+                        <p class="text-sm text-slate-600">Analysis showing customers with tenure over 70 months are
+                            statistically much less likely to leave.</p>
+                    </div>
+                    <div class="p-6 bg-white border border-slate-200 rounded-xl">
+                        <h4 class="font-bold text-brand-700 mb-2">Monthly Charges</h4>
+                        <p class="text-sm text-slate-600">Trends showing customers with higher bills ($70–$110 range)
+                            have a higher frequency of churning.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Code Snippets -->
+            <section class="section-anchor mb-16">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="h-8 w-1 bg-brand-600 rounded-full"></div>
+                    <h2 class="text-2xl font-display font-bold text-slate-900">Technical Execution</h2>
+                </div>
+                <div class="space-y-4">
+                    <div class="bg-slate-900 rounded-xl overflow-hidden">
+                        <div class="px-4 py-2 bg-slate-800 text-slate-400 text-xs font-mono flex justify-between">
+                            <span>pandas_preprocessing.py</span>
+                            <span class="text-brand-400">Python</span>
+                        </div>
+                        <pre class="p-6 text-sm text-slate-300 font-mono overflow-x-auto"><code>df.drop(columns=['customerID'], axis='columns', inplace=True)
+pd.to_numeric(df.TotalCharges, errors='coerce')
+df1[df1.Churn == 'No'].tenure
+pd.get_dummies(data=df1, columns=['InternetService', 'Contract', 'PaymentMethod'])</code></pre>
+                    </div>
+
+                    <div class="bg-slate-900 rounded-xl overflow-hidden">
+                        <div class="px-4 py-2 bg-slate-800 text-slate-400 text-xs font-mono flex justify-between">
+                            <span>keras_model.py</span>
+                            <span class="text-brand-400">TensorFlow</span>
+                        </div>
+                        <pre class="p-6 text-sm text-slate-300 font-mono overflow-x-auto"><code>scaler = MinMaxScaler()
+df2[cols_to_scale] = scaler.fit_transform(df2[cols_to_scale])
+
+model = keras.Sequential([
+    keras.layers.Dense(20, input_shape=(26,), activation='relu'),
+    keras.layers.Dense(1, activation='sigmoid')
+])
+
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])</code></pre>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                            <span class="block text-xs font-bold text-slate-400 uppercase mb-1">Accuracy</span>
+                            <code class="text-brand-700 text-xs font-semibold">Correct / Total</code>
+                        </div>
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                            <span class="block text-xs font-bold text-slate-400 uppercase mb-1">Precision</span>
+                            <code class="text-brand-700 text-xs font-semibold">TP / (TP + FP)</code>
+                        </div>
+                        <div class="p-4 bg-slate-50 border border-slate-200 rounded-lg">
+                            <span class="block text-xs font-bold text-slate-400 uppercase mb-1">Recall</span>
+                            <code class="text-brand-700 text-xs font-semibold">TP / (TP + FN)</code>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Recall -->
+            <section class="section-anchor mb-20">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="h-8 w-1 bg-brand-600 rounded-full"></div>
+                    <h2 class="text-2xl font-display font-bold text-slate-900">Active Recall Checkpoint</h2>
+                </div>
+                <div class="space-y-4">
+                    <div class="recall-card p-6 bg-brand-50 border border-brand-100 rounded-2xl group cursor-help">
+                        <div class="flex items-start gap-4">
+                            <span class="mt-1 text-brand-600 font-bold">01.</span>
+                            <p class="text-slate-800 font-medium">Why is it necessary to convert categorical text data
+                                into numerical values before feeding them into an artificial neural network?</p>
+                        </div>
+                    </div>
+                    <div class="recall-card p-6 bg-brand-50 border border-brand-100 rounded-2xl group cursor-help">
+                        <div class="flex items-start gap-4">
+                            <span class="mt-1 text-brand-600 font-bold">02.</span>
+                            <p class="text-slate-800 font-medium">Explain how to handle numerical columns that are
+                                incorrectly formatted as objects or strings in a Pandas DataFrame.</p>
+                        </div>
+                    </div>
+                    <div class="recall-card p-6 bg-brand-50 border border-brand-100 rounded-2xl group cursor-help">
+                        <div class="flex items-start gap-4">
+                            <span class="mt-1 text-brand-600 font-bold">03.</span>
+                            <p class="text-slate-800 font-medium">How does the choice of activation function for the
+                                output layer change when performing binary classification versus multi-class
+                                classification?</p>
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-6 text-sm text-slate-400 text-center italic">Try to answer these without looking back at
+                    the notes.</p>
+            </section>
+
+        </main>
+
+        <script>
+            // Micro-animations for section reveals
+            const observerOptions = {
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                        entry.target.classList.remove('opacity-0', 'translate-y-4');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-4');
+                observer.observe(section);
+            });
+        </script>
+    </div>
+</body>
+
+</html>

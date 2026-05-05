@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            900: '#1e1b4b',
+                        },
+                        accent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <title>Deep Learning Benchmark Study Guide</title>
+</head>
+
+<body class="antialiased">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item active">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <!-- Header Section -->
+        <header class="pt-16 pb-12 text-center bg-white border-b border-gray-100">
+            <div class="container mx-auto px-4">
+                <span
+                    class="inline-block px-4 py-1.5 mb-4 text-xs font-bold tracking-widest text-brand-600 uppercase bg-brand-50 rounded-full">
+                    Technical Resource
+                </span>
+                <h1 class="text-4xl md:text-5xl font-extrabold font-display text-neutral-900 tracking-tight mb-4">
+                    Comprehensive Study Guide
+                </h1>
+                <p class="text-lg text-gray-500 max-w-2xl mx-auto font-medium">
+                    CPU vs. GPU Benchmarking in Deep Learning: Performance Analysis & Technical Execution
+                </p>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto max-w-4xl px-4 py-12 space-y-12">
+
+            <!-- Executive Summary -->
+            <section id="executive-summary" class="section-card p-8 md:p-10">
+                <h2 class="text-2xl font-bold font-display text-neutral-900 mb-6 flex items-center">
+                    <span
+                        class="w-8 h-8 bg-brand-600 text-white rounded-lg flex items-center justify-center mr-3 text-sm">01</span>
+                    Executive Summary
+                </h2>
+                <div class="prose prose-blue text-neutral-800">
+                    <p class="leading-relaxed">
+                        This analysis benchmarks the performance difference between a <strong>CPU</strong> and a
+                        <strong>GPU</strong> when training a deep learning model for image classification. Using an
+                        <strong>Artificial Neural Network (ANN)</strong> and the <strong>CIFAR-10 dataset</strong>, the
+                        demonstration highlights how specialized hardware like NVIDIA GPUs can accelerate training
+                        speeds by approximately <strong>15 times</strong> compared to standard processors.
+                    </p>
+                </div>
+            </section>
+
+            <!-- The Why -->
+            <section id="the-why" class="section-card p-8 md:p-10 accent-border bg-brand-50/30">
+                <h2 class="text-2xl font-bold font-display text-neutral-900 mb-6 flex items-center">
+                    <span
+                        class="w-8 h-8 bg-brand-600 text-white rounded-lg flex items-center justify-center mr-3 text-sm">02</span>
+                    The "Why" (First Principles)
+                </h2>
+                <div class="prose prose-blue text-neutral-800">
+                    <p>
+                        Deep learning involves massive <strong>matrix multiplications</strong> that are computationally
+                        expensive for a standard CPU, which is designed for general-purpose sequential tasks. GPUs are
+                        built for <strong>massive parallelism</strong>, allowing thousands of small operations to occur
+                        simultaneously. This tutorial addresses the common bottleneck of long training durations,
+                        showing that leveraging <strong>CUDA-enabled hardware</strong> is essential for scaling deep
+                        learning experiments.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Step-by-Step Notes -->
+            <section id="detailed-notes" class="section-card p-8 md:p-10">
+                <h2 class="text-2xl font-bold font-display text-neutral-900 mb-8 flex items-center">
+                    <span
+                        class="w-8 h-8 bg-brand-600 text-white rounded-lg flex items-center justify-center mr-3 text-sm">03</span>
+                    Detailed Step-by-Step Notes
+                </h2>
+                <div class="space-y-8">
+                    <div>
+                        <h3 class="text-lg font-bold text-brand-700 mb-3">1. Environment Configuration and Verification
+                        </h3>
+                        <ul class="space-y-2 ml-4 list-none">
+                            <li class="list-bullet">Import core libraries including <strong>TensorFlow</strong>,
+                                <strong>Keras</strong>, <strong>Matplotlib</strong>, and <strong>NumPy</strong>.</li>
+                            <li class="list-bullet">Use TensorFlow configuration commands to list physical devices and
+                                verify if a <strong>GPU is detected</strong>.</li>
+                            <li class="list-bullet">Ensure <strong>CUDA</strong> and <strong>cuDNN</strong> libraries
+                                are correctly installed and version-compatible with the TensorFlow build.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-bold text-brand-700 mb-3">2. Data Loading and Exploration</h3>
+                        <ul class="space-y-2 ml-4 list-none">
+                            <li class="list-bullet">Load the <strong>CIFAR-10 dataset</strong> directly through the
+                                Keras API.</li>
+                            <li class="list-bullet">The dataset consists of <strong>60,000 images</strong> (50,000
+                                training, 10,000 test) across <strong>10 classes</strong> (airplane, automobile, bird,
+                                cat, deer, dog, frog, horse, ship, truck).</li>
+                            <li class="list-bullet">Each image is a small <strong>32x32 pixel array</strong> with 3
+                                color channels (RGB).</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-bold text-brand-700 mb-3">3. Data Preprocessing</h3>
+                        <ul class="space-y-2 ml-4 list-none">
+                            <li class="list-bullet"><strong>Scaling</strong>: Normalize pixel values by dividing the
+                                entire dataset by <strong>255</strong>. This converts the range from 0-255 to 0-1, which
+                                helps the neural network learn more effectively.</li>
+                            <li class="list-bullet"><strong>Categorical Encoding</strong>: Apply <strong>One-Hot
+                                    Encoding</strong> to the target labels using the Keras <code
+                                    class="bg-gray-100 px-1 rounded text-sm text-pink-600 font-mono">to_categorical</code>
+                                utility. This transforms discrete integers (e.g., 6) into binary vectors (e.g.,
+                                [0,0,0,0,0,0,1,0,0,0]).</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-bold text-brand-700 mb-3">4. Designing the Neural Network</h3>
+                        <ul class="space-y-2 ml-4 list-none">
+                            <li class="list-bullet">Instantiate a <strong>Keras Sequential model</strong>.</li>
+                            <li class="list-bullet">Add a <strong>Flatten layer</strong> to convert the 32x32x3 input
+                                into a single vector of <strong>3,072 elements</strong>.</li>
+                            <li class="list-bullet">Create two large hidden <strong>Dense layers</strong> (3,000 and
+                                1,000 neurons) using the <strong>ReLU activation function</strong> to capture complex
+                                patterns.</li>
+                            <li class="list-bullet">Define an output <strong>Dense layer</strong> with 10 neurons using
+                                the <strong>Sigmoid activation function</strong> for class probability prediction.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-lg font-bold text-brand-700 mb-3">5. Model Compilation and Benchmarking</h3>
+                        <ul class="space-y-2 ml-4 list-none">
+                            <li class="list-bullet">Compile the model using the <strong>Stochastic Gradient Descent
+                                    (SGD)</strong> optimizer and <strong>categorical cross-entropy</strong> loss.</li>
+                            <li class="list-bullet">Utilize the Jupyter magic command <code
+                                    class="bg-gray-100 px-1 rounded text-sm text-pink-600 font-mono">%%timeit</code> to
+                                measure the execution time of training one epoch.</li>
+                            <li class="list-bullet">Compare the <strong>wall-clock time</strong> between training on the
+                                CPU (<strong>/CPU:0</strong>) and the GPU (<strong>/GPU:0</strong>).</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Highlighted Examples -->
+            <section id="examples" class="section-card p-8 md:p-10 border-t-4 border-teal-500">
+                <h2 class="text-2xl font-bold font-display text-neutral-900 mb-6 flex items-center">
+                    <span
+                        class="w-8 h-8 bg-teal-600 text-white rounded-lg flex items-center justify-center mr-3 text-sm">04</span>
+                    Highlighted Examples
+                </h2>
+                <div class="grid grid-cols-1 gap-6">
+                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+                        <p class="mb-4 font-semibold text-teal-700 uppercase tracking-wider text-xs">Visual Confirmation
+                        </p>
+                        <p class="text-neutral-800"><strong>Dataset Visualization</strong>: Plotting the first few
+                            images of the training set confirms that <strong>label 6</strong> corresponds to a frog and
+                            <strong>label 9</strong> corresponds to a truck.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+                        <p class="mb-4 font-semibold text-teal-700 uppercase tracking-wider text-xs">Inference Logic</p>
+                        <p class="text-neutral-800"><strong>Prediction Logic</strong>: The <code
+                                class="text-sm font-mono text-pink-600">model.predict</code> function returns a list of
+                            probabilities; using NumPy's <code class="text-sm font-mono text-pink-600">argmax</code>
+                            function identifies the index with the highest probability, representing the final
+                            classification.</p>
+                    </div>
+                    <div class="bg-gray-50 p-6 rounded-lg border border-gray-100">
+                        <p class="mb-4 font-semibold text-teal-700 uppercase tracking-wider text-xs">Real-world Metric
+                        </p>
+                        <p class="text-neutral-800"><strong>Speed Comparison</strong>: In a test of 10 epochs, a
+                            <strong>CPU might take over 7 minutes</strong> to complete the task, whereas a high-end GPU
+                            like the <strong>NVIDIA Titan RTX finishes in just 30 seconds</strong>.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Code Snippets -->
+            <section id="code" class="section-card p-8 md:p-10 bg-neutral-900 text-white">
+                <h2 class="text-2xl font-bold font-display text-white mb-8 flex items-center">
+                    <span
+                        class="w-8 h-8 bg-brand-600 text-white rounded-lg flex items-center justify-center mr-3 text-sm">05</span>
+                    Technical Execution
+                </h2>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Checking for GPU</label>
+                        <pre
+                            class="p-4 rounded-lg overflow-x-auto border border-gray-800 font-mono text-sm"><code>tf.config.experimental.list_physical_devices('GPU')</code></pre>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Normalization</label>
+                        <pre
+                            class="p-4 rounded-lg overflow-x-auto border border-gray-800 font-mono text-sm"><code>X_train_scaled = X_train / 255</code></pre>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">One-Hot Encoding</label>
+                        <pre class="p-4 rounded-lg overflow-x-auto border border-gray-800 font-mono text-sm"><code>y_train_categorical = tf.keras.utils.to_categorical(
+    y_train, 
+    num_classes=10, 
+    dtype='float32'
+)</code></pre>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Model Architecture</label>
+                        <pre class="p-4 rounded-lg overflow-x-auto border border-gray-800 font-mono text-sm"><code>model = keras.Sequential([
+    keras.layers.Flatten(input_shape=(32,32,3)),
+    keras.layers.Dense(3000, activation='relu'),
+    keras.layers.Dense(1000, activation='relu'),
+    keras.layers.Dense(10, activation='sigmoid')
+])</code></pre>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-400 uppercase mb-2">Benchmarking Block</label>
+                        <pre class="p-4 rounded-lg overflow-x-auto border border-gray-800 font-mono text-sm"><code>with tf.device('/GPU:0'):
+    gpu_model = get_model()
+    gpu_model.fit(X_train_scaled, y_train_categorical, epochs=1)</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Recall -->
+            <section id="recall" class="section-card p-8 md:p-10 mb-20 bg-white border-2 border-brand-100">
+                <h2 class="text-2xl font-bold font-display text-neutral-900 mb-8 flex items-center">
+                    <span
+                        class="w-8 h-8 bg-brand-600 text-white rounded-lg flex items-center justify-center mr-3 text-sm">06</span>
+                    Active Recall Checkpoint
+                </h2>
+                <ol class="space-y-6">
+                    <li class="flex items-start">
+                        <span
+                            class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-brand-50 text-brand-700 font-bold rounded-full mr-4">1</span>
+                        <p class="text-lg text-neutral-800 pt-0.5">What is the specific <strong>mathematical
+                                benefit</strong> of scaling pixel values to a range of 0 to 1 before training?</p>
+                    </li>
+                    <li class="flex items-start">
+                        <span
+                            class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-brand-50 text-brand-700 font-bold rounded-full mr-4">2</span>
+                        <p class="text-lg text-neutral-800 pt-0.5">When would you choose
+                            <strong>sparse_categorical_crossentropy</strong> over
+                            <strong>categorical_crossentropy</strong> as your loss function?</p>
+                    </li>
+                    <li class="flex items-start">
+                        <span
+                            class="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-brand-50 text-brand-700 font-bold rounded-full mr-4">3</span>
+                        <p class="text-lg text-neutral-800 pt-0.5">How does the <strong>Flatten layer</strong> transform
+                            a 32x32x3 image array into a format usable by a standard Dense layer?</p>
+                    </li>
+                </ol>
+                <div class="mt-10 p-4 bg-gray-50 rounded-lg text-center">
+                    <p class="text-sm text-gray-500 italic">Try to answer these without looking back at the notes to
+                        reinforce your learning!</p>
+                </div>
+            </section>
+
+        </main>
+
+        <script>
+            // Smooth hover animations and simple interactions could go here
+            document.querySelectorAll('.section-card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.style.borderColor = 'rgba(2, 132, 199, 0.2)';
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.borderColor = 'transparent';
+                });
+            });
+        </script>
+    </div>
+</body>
+
+</html>

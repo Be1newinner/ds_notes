@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            900: '#1e1b4b',
+                        },
+                        accent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <title>Deep Learning Study Guide: Activation Functions</title>
+</head>
+
+<body class="antialiased">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item active">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <!-- Header Section -->
+        <header class="py-12 md:py-20 px-6 bg-gradient-to-br from-neutral-900 to-brand-900 text-white">
+            <div class="max-w-4xl mx-auto">
+                <span
+                    class="inline-block px-3 py-1 mb-4 text-xs font-bold tracking-widest uppercase bg-brand-500 rounded-full">Neural
+                    Networks Series</span>
+                <h1 class="text-4xl md:text-6xl font-display font-extrabold tracking-tight mb-4">Activation Functions
+                </h1>
+                <p class="text-brand-100 text-lg md:text-xl max-w-2xl font-light">A comprehensive study guide on
+                    non-linearity, neuron mechanisms, and modern optimization techniques.</p>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-6 -mt-10 pb-20">
+            <div class="max-w-4xl mx-auto space-y-12">
+
+                <!-- Executive Summary -->
+                <section class="glass-card p-8 md:p-10 rounded-2xl">
+                    <div class="section-divider"></div>
+                    <h2
+                        class="text-2xl md:text-3xl font-display font-bold text-neutral-900 mb-6 uppercase tracking-tight">
+                        Executive Summary</h2>
+                    <p class="text-lg text-neutral-700 leading-relaxed">
+                        This guide explores the fundamental role of activation functions in neural networks. Without
+                        them, a neural network is just a linear regression model. We cover <strong>Sigmoid, tanh, ReLU,
+                            and Leaky ReLU</strong>, along with their mathematical derivatives which are crucial for
+                        backpropagation.
+                    </p>
+                </section>
+
+                <!-- Technical Deep Dive: Mathematical Properties -->
+                <section class="glass-card p-8 md:p-10 rounded-2xl">
+                    <div class="section-divider"></div>
+                    <h2
+                        class="text-2xl md:text-3xl font-display font-bold text-neutral-900 mb-8 uppercase tracking-tight">
+                        Technical Deep Dive: Math & Gradients</h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-brand-800 mb-3">Sigmoid ($\sigma$)</h4>
+                            <p class="text-sm text-slate-600 mb-3">$\sigma(x) = \frac{1}{1 + e^{-x}}$</p>
+                            <p class="text-xs font-mono text-slate-500">Derivative: $\sigma(x)(1 - \sigma(x))$</p>
+                            <p class="mt-2 text-xs text-slate-400">Pro: Range (0,1). Con: Vanishing Gradients.</p>
+                        </div>
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-brand-800 mb-3">Tanh</h4>
+                            <p class="text-sm text-slate-600 mb-3">$tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}$</p>
+                            <p class="text-xs font-mono text-slate-500">Derivative: $1 - tanh^2(x)$</p>
+                            <p class="mt-2 text-xs text-slate-400">Pro: Zero-centered. Con: Vanishing Gradients.</p>
+                        </div>
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-brand-800 mb-3">ReLU</h4>
+                            <p class="text-sm text-slate-600 mb-3">$f(x) = max(0, x)$</p>
+                            <p class="text-xs font-mono text-slate-500">Derivative: $1$ if $x > 0$, else $0$</p>
+                            <p class="mt-2 text-xs text-slate-400">Pro: Fast, no vanishing gradients for $x>0$. Con:
+                                Dying ReLU.</p>
+                        </div>
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
+                            <h4 class="font-bold text-brand-800 mb-3">Leaky ReLU</h4>
+                            <p class="text-sm text-slate-600 mb-3">$f(x) = max(0.01x, x)$</p>
+                            <p class="text-xs font-mono text-slate-500">Derivative: $1$ if $x > 0$, else $0.01$</p>
+                            <p class="mt-2 text-xs text-slate-400">Pro: Fixes "Dying ReLU" problem.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Implementation & Code -->
+                <section class="glass-card p-8 md:p-10 rounded-2xl">
+                    <div class="section-divider"></div>
+                    <h2
+                        class="text-2xl md:text-3xl font-display font-bold text-neutral-900 mb-8 uppercase tracking-tight">
+                        Technical Execution</h2>
+                    <div class="code-block">
+                        <pre><code class="font-mono text-sm leading-relaxed"><span class="text-brand-500">import</span> numpy <span class="text-brand-500">as</span> np
+
+<span class="text-gray-500"># Numpy vectorized implementations</span>
+<span class="text-brand-500">def</span> <span class="text-yellow-400">sigmoid</span>(x):
+    <span class="text-brand-500">return</span> 1 / (1 + np.exp(-x))
+
+<span class="text-brand-500">def</span> <span class="text-yellow-400">relu</span>(x):
+    <span class="text-brand-500">return</span> np.maximum(0, x)
+
+<span class="text-brand-500">def</span> <span class="text-yellow-400">leaky_relu</span>(x, alpha=0.01):
+    <span class="text-brand-500">return</span> np.where(x > 0, x, alpha * x)
+
+<span class="text-gray-500"># Example of "Dying ReLU" visualization</span>
+inputs = np.array([-10, -5, 0, 5, 10])
+print(<span class="text-green-400">f"ReLU Output: {relu(inputs)}"</span>) 
+<span class="text-gray-500"># Result: [0 0 0 5 10] - Notice the first three inputs are "dead"</span></code></pre>
+                    </div>
+                </section>
+
+                <!-- Recall Checkpoint -->
+                <section class="glass-card p-8 md:p-10 rounded-2xl bg-neutral-900 text-white">
+                    <div class="section-divider bg-white"></div>
+                    <h2 class="text-2xl md:text-3xl font-display font-bold mb-8 uppercase tracking-tight">Active Recall
+                        Checkpoint</h2>
+                    <div class="space-y-6">
+                        <div class="p-6 bg-white/10 rounded-xl border border-white/10">
+                            <h4 class="font-bold text-lg mb-2">The Linear Trap</h4>
+                            <p class="text-neutral-400 text-sm italic">If you have 100 hidden layers but no activation
+                                function, how many effective layers do you have? Why?</p>
+                        </div>
+                        <div class="p-6 bg-white/10 rounded-xl border border-white/10">
+                            <h4 class="font-bold text-lg mb-2">Vanishing Gradients</h4>
+                            <p class="text-neutral-400 text-sm italic">Look at the derivative of Sigmoid. What is the
+                                maximum value it can take? How does this explain why training deep networks with Sigmoid
+                                is slow?</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

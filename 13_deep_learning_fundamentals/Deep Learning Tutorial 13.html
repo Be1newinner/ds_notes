@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            500: '#6366f1',
+                            900: '#1e1b4b',
+                        },
+                        accent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <title>Building Neural Networks from Scratch | Study Guide</title>
+</head>
+
+<body class="antialiased">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item active">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <header class="py-20 px-6 text-center max-w-4xl mx-auto">
+            <div
+                class="inline-block px-4 py-1.5 mb-6 text-sm font-semibold tracking-wide text-brand-700 uppercase bg-brand-100 rounded-full">
+                Engineering Excellence
+            </div>
+            <h1 class="text-4xl md:text-6xl font-display font-extrabold text-brand-950 tracking-tight leading-tight">
+                The <span class="text-brand-600">Scratch</span> Implementation
+            </h1>
+            <p class="mt-6 text-lg text-slate-600 font-normal max-w-2xl mx-auto leading-relaxed">
+                Deconstructing the Keras/TensorFlow API to build a production-grade Neural Network class using raw
+                NumPy.
+            </p>
+        </header>
+
+        <main class="max-w-4xl mx-auto px-6 pb-24">
+
+            <!-- Executive Summary -->
+            <section class="mb-16">
+                <div class="glass-card p-8 rounded-2xl shadow-sm border border-slate-200">
+                    <h2 class="text-2xl font-display font-bold text-slate-900 mb-4">Executive Summary</h2>
+                    <p class="text-lg leading-relaxed text-slate-700">
+                        This guide moves beyond simple functions to **Object-Oriented Programming (OOP)** for Deep
+                        Learning. We build a `myNN` class that encapsulates state (weights/biases) and behavior
+                        (training/prediction), mirroring the industry-standard `.fit()` and `.predict()` workflow.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Technical Deep Dive -->
+            <section class="mb-16">
+                <h2 class="text-3xl font-display font-bold text-slate-900 mb-8">Technical Deep Dive: The Engine Under
+                    the Hood</h2>
+
+                <div class="space-y-8">
+                    <!-- Weight Initialization -->
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <h3 class="text-xl font-bold text-brand-600 mb-4">1. Smart Weight Initialization</h3>
+                        <p class="text-slate-600 mb-4">Setting weights to 1 or 0 is dangerous (symmetry breaking). For
+                            deeper networks, we use <strong>Xavier/Glorot Initialization</strong>: drawing weights from
+                            a distribution with variance related to the number of inputs.</p>
+                        <div class="bg-slate-50 p-4 rounded-xl font-mono text-xs text-brand-800">
+                            self.weights = np.random.randn(input_size) * np.sqrt(1/input_size)
+                        </div>
+                    </div>
+
+                    <!-- Vectorized Backprop -->
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <h3 class="text-xl font-bold text-brand-600 mb-4">2. Vectorized Backpropagation</h3>
+                        <p class="text-slate-600 mb-4">Instead of calculating gradients per weight using loops, we
+                            calculate the entire gradient vector at once using Matrix Transposition.</p>
+                        <div class="bg-brand-900 p-6 rounded-2xl font-mono text-sm text-brand-100">
+                            # Gradient of weights = (1/m) * (X_transposed dot error)<br />
+                            dw = (1/m) * np.dot(X.T, (y_pred - y))
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Code Execution -->
+            <section class="mb-16">
+                <h2 class="text-3xl font-display font-bold text-slate-900 mb-6 text-center">Class Implementation</h2>
+                <div class="bg-slate-900 rounded-2xl p-8 font-mono text-sm text-brand-100 shadow-2xl">
+                    <pre><code><span class="text-blue-400">class</span> <span class="text-yellow-400">myNN</span>:
+    <span class="text-blue-400">def</span> <span class="text-emerald-400">__init__</span>(self, input_size):
+        <span class="text-slate-500"># Random initialization for better convergence</span>
+        self.w = np.random.randn(input_size)
+        self.b = <span class="text-orange-400">0</span>
+
+    <span class="text-blue-400">def</span> <span class="text-emerald-400">fit</span>(self, X, y, epochs, lr):
+        <span class="text-purple-400">for</span> _ <span class="text-purple-400">in</span> <span class="text-blue-400">range</span>(epochs):
+            <span class="text-slate-500"># Forward pass</span>
+            y_hat = <span class="text-blue-400">self</span>.predict(X)
+            <span class="text-slate-500"># Vectorized Update</span>
+            dw = (<span class="text-orange-400">1</span>/len(y)) * np.dot(X.T, (y_hat - y))
+            db = np.mean(y_hat - y)
+            <span class="text-blue-400">self</span>.w -= lr * dw
+            <span class="text-blue-400">self</span>.b -= lr * db
+
+    <span class="text-blue-400">def</span> <span class="text-emerald-400">predict</span>(self, X):
+        <span class="text-purple-400">return</span> <span class="text-orange-400">1</span> / (<span class="text-orange-400">1</span> + np.exp(-(np.dot(X, <span class="text-blue-400">self</span>.w) + <span class="text-blue-400">self</span>.b)))</code></pre>
+                </div>
+            </section>
+
+            <!-- Recall Checkpoint -->
+            <section class="mb-16">
+                <div class="bg-brand-950 rounded-3xl p-12 text-white">
+                    <h2 class="text-3xl font-display font-bold mb-8">Active Recall Checkpoint</h2>
+                    <div class="space-y-6">
+                        <div class="p-6 bg-white/5 rounded-xl border border-white/10">
+                            <p class="font-bold">State Management</p>
+                            <p class="text-slate-400 text-sm italic">Why do we store 'w' and 'b' as 'self' attributes
+                                rather than just returning them from the fit function?</p>
+                        </div>
+                        <div class="p-6 bg-white/5 rounded-xl border border-white/10">
+                            <p class="font-bold">The Abstraction Layer</p>
+                            <p class="text-slate-400 text-sm italic">Compare this class to Keras. Which Keras layer does
+                                this specific implementation replicate? (e.g., Dense, Conv2D, Dropout?)</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

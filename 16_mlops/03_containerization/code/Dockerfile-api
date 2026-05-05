@@ -1,0 +1,24 @@
+# 1. Base Image
+FROM python:3.9-slim
+
+# 2. Set working directory
+WORKDIR /app
+
+# 3. Copy requirements FIRST
+# This is a Docker best practice. Docker caches layers. 
+# If requirements.txt hasn't changed, Docker won't reinstall packages
+# even if your python code has changed.
+COPY requirements.txt .
+
+# 4. Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 5. Copy the rest of the code
+COPY example-02-api.py .
+
+# 6. Expose the port (Documentation purpose)
+EXPOSE 8000
+
+# 7. Start the Uvicorn server
+# Note: Host must be 0.0.0.0 so it is accessible outside the container
+CMD ["uvicorn", "example-02-api:app", "--host", "0.0.0.0", "--port", "8000"]
