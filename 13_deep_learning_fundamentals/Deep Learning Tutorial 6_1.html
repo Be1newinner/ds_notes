@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Keras Layers | Deep Learning Mastery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 500: '#6366f1', 900: '#1e1b4b' },
+                        accent: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="antialiased">
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6_1.html" class="nav-item active">
+                    <span class="nav-number">6.1</span>
+                    <span>Core Keras Layers</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
+    <div class="main-content">
+        <header class="w-full py-16 md:py-24 px-6 text-center border-b border-white/10">
+            <div class="max-w-4xl mx-auto">
+                <span
+                    class="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-[0.2em] text-indigo-400 uppercase bg-indigo-500/10 rounded-full border border-indigo-500/20">
+                    Tutorial 6.1
+                </span>
+                <h1 class="text-5xl md:text-7xl font-bold text-white tracking-tight leading-none mb-8">
+                    Core Keras Layers <br />
+                    <span class="gradient-text">Mastering Architecture</span>
+                </h1>
+                <p class="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-12">
+                    The fundamental building blocks of Deep Learning: Dense, Flatten, Convolutional, Recurrent, and
+                    Regularization layers explained with real-world applications.
+                </p>
+            </div>
+        </header>
+        <main class="max-w-4xl mx-auto px-6 pb-24">
+
+            <!-- Executive Summary -->
+            <section class="mb-16 mt-8">
+                <div class="bg-white p-8 rounded-3xl border-l-4 border-l-brand-500 shadow-sm">
+                    <h2 class="text-2xl font-bold font-display text-neutral-900 mb-4">Executive Summary</h2>
+                    <p class="text-slate-700 leading-relaxed text-lg italic">
+                        In Keras, a model is essentially a graph of layers. Understanding which layer to use, how to
+                        configure it, and when to apply it is the difference between a model that learns and one that
+                        fails. This guide covers the essential layers required for 90% of beginner to intermediate deep
+                        learning tasks.
+                    </p>
+                </div>
+            </section>
+
+            <!-- Technical Deep Dive -->
+            <section class="mb-16">
+                <h2 class="text-3xl font-bold font-display text-neutral-900 mb-8">1. The Fundamentals</h2>
+
+                <div class="space-y-8">
+                    <!-- Dense Layer -->
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span
+                                class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg font-mono font-bold text-sm">keras.layers.Dense</span>
+                            <h3 class="text-2xl font-bold text-neutral-900">Fully Connected Layer</h3>
+                        </div>
+                        <p class="text-slate-600 mb-4">
+                            The most common and basic layer. Every neuron in a Dense layer is connected to every neuron
+                            in the preceding layer. It learns global patterns across all its inputs.
+                        </p>
+
+                        <div class="bg-slate-900 rounded-xl p-4 mb-4 overflow-x-auto">
+                            <pre><code class="text-sm font-mono text-slate-300"><span class="text-pink-400">from</span> keras.layers <span class="text-pink-400">import</span> Dense
+
+<span class="text-slate-500"># 64 neurons, ReLU activation function</span>
+layer = Dense(units=<span class="text-orange-400">64</span>, activation=<span class="text-green-400">'relu'</span>)</code></pre>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                            <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                                🌍 Real-Life Use Case
+                            </h4>
+                            <p class="text-sm text-slate-600">
+                                <strong>Tabular Data & Final Classification:</strong> Predicting house prices based on
+                                features (bedrooms, area, age) or outputting the final probabilities (using Softmax) in
+                                an image classification model.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Flatten Layer -->
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span
+                                class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-lg font-mono font-bold text-sm">keras.layers.Flatten</span>
+                            <h3 class="text-2xl font-bold text-neutral-900">Flattening Tensor</h3>
+                        </div>
+                        <p class="text-slate-600 mb-4">
+                            Takes a multi-dimensional tensor (like a 2D image) and unrolls it into a single, long 1D
+                            array. It does not have any parameters to learn; it just reshapes the data.
+                        </p>
+
+                        <div class="bg-slate-900 rounded-xl p-4 mb-4 overflow-x-auto">
+                            <pre><code class="text-sm font-mono text-slate-300"><span class="text-pink-400">from</span> keras.layers <span class="text-pink-400">import</span> Flatten
+
+<span class="text-slate-500"># Converts shape (28, 28) to (784,)</span>
+layer = Flatten()</code></pre>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                            <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                                🌍 Real-Life Use Case
+                            </h4>
+                            <p class="text-sm text-slate-600">
+                                <strong>Connecting CNNs to Dense Layers:</strong> After a Convolutional Neural Network
+                                processes an image in 2D, the data must be Flattened before it can be fed into a
+                                standard Dense layer for final classification.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-16">
+                <h2 class="text-3xl font-bold font-display text-neutral-900 mb-8">2. Computer Vision Layers</h2>
+
+                <div class="space-y-8">
+                    <!-- Conv2D -->
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span
+                                class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-lg font-mono font-bold text-sm">keras.layers.Conv2D</span>
+                            <h3 class="text-2xl font-bold text-neutral-900">2D Convolution</h3>
+                        </div>
+                        <p class="text-slate-600 mb-4">
+                            Creates a convolution kernel that is convolved with the layer input to produce a tensor of
+                            outputs. It learns spatial hierarchies and localized patterns (like edges, textures).
+                        </p>
+
+                        <div class="bg-slate-900 rounded-xl p-4 mb-4 overflow-x-auto">
+                            <pre><code class="text-sm font-mono text-slate-300"><span class="text-pink-400">from</span> keras.layers <span class="text-pink-400">import</span> Conv2D
+
+<span class="text-slate-500"># 32 filters, 3x3 kernel size</span>
+layer = Conv2D(filters=<span class="text-orange-400">32</span>, kernel_size=(<span class="text-orange-400">3</span>, <span class="text-orange-400">3</span>), activation=<span class="text-green-400">'relu'</span>)</code></pre>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                            <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                                🌍 Real-Life Use Case
+                            </h4>
+                            <p class="text-sm text-slate-600">
+                                <strong>Image Recognition:</strong> Analyzing X-ray scans for tumors, self-driving cars
+                                detecting pedestrians, or facial recognition systems on smartphones.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- MaxPooling2D -->
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span
+                                class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-lg font-mono font-bold text-sm">keras.layers.MaxPooling2D</span>
+                            <h3 class="text-2xl font-bold text-neutral-900">Downsampling</h3>
+                        </div>
+                        <p class="text-slate-600 mb-4">
+                            Reduces the spatial dimensions (height, width) of the input volume by taking the maximum
+                            value over an input window. This reduces computational cost and provides translational
+                            invariance.
+                        </p>
+
+                        <div class="bg-slate-900 rounded-xl p-4 mb-4 overflow-x-auto">
+                            <pre><code class="text-sm font-mono text-slate-300"><span class="text-pink-400">from</span> keras.layers <span class="text-pink-400">import</span> MaxPooling2D
+
+<span class="text-slate-500"># Reduces image size by half in both dimensions</span>
+layer = MaxPooling2D(pool_size=(<span class="text-orange-400">2</span>, <span class="text-orange-400">2</span>))</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-16">
+                <h2 class="text-3xl font-bold font-display text-neutral-900 mb-8">3. Sequence & Regularization</h2>
+
+                <div class="space-y-8">
+                    <!-- LSTM -->
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span
+                                class="bg-amber-100 text-amber-700 px-3 py-1 rounded-lg font-mono font-bold text-sm">keras.layers.LSTM</span>
+                            <h3 class="text-2xl font-bold text-neutral-900">Long Short-Term Memory</h3>
+                        </div>
+                        <p class="text-slate-600 mb-4">
+                            A type of Recurrent Neural Network (RNN) layer capable of learning long-term dependencies in
+                            sequence data, solving the vanishing gradient problem of standard RNNs.
+                        </p>
+
+                        <div class="bg-slate-900 rounded-xl p-4 mb-4 overflow-x-auto">
+                            <pre><code class="text-sm font-mono text-slate-300"><span class="text-pink-400">from</span> keras.layers <span class="text-pink-400">import</span> LSTM
+
+<span class="text-slate-500"># 64 memory units</span>
+layer = LSTM(units=<span class="text-orange-400">64</span>, return_sequences=<span class="text-pink-400">False</span>)</code></pre>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                            <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                                🌍 Real-Life Use Case
+                            </h4>
+                            <p class="text-sm text-slate-600">
+                                <strong>Time Series & NLP:</strong> Stock market price forecasting, language translation
+                                (Google Translate), and speech recognition.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Dropout -->
+                    <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span
+                                class="bg-rose-100 text-rose-700 px-3 py-1 rounded-lg font-mono font-bold text-sm">keras.layers.Dropout</span>
+                            <h3 class="text-2xl font-bold text-neutral-900">Regularization</h3>
+                        </div>
+                        <p class="text-slate-600 mb-4">
+                            Randomly sets a fraction of input units to 0 at each step during training time, which helps
+                            prevent overfitting by forcing the network to learn redundant representations.
+                        </p>
+
+                        <div class="bg-slate-900 rounded-xl p-4 mb-4 overflow-x-auto">
+                            <pre><code class="text-sm font-mono text-slate-300"><span class="text-pink-400">from</span> keras.layers <span class="text-pink-400">import</span> Dropout
+
+<span class="text-slate-500"># Drops 30% of neurons randomly during training</span>
+layer = Dropout(rate=<span class="text-orange-400">0.3</span>)</code></pre>
+                        </div>
+
+                        <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                            <h4 class="font-bold text-slate-800 mb-2 flex items-center gap-2">
+                                🌍 Real-Life Use Case
+                            </h4>
+                            <p class="text-sm text-slate-600">
+                                <strong>Overfitting Prevention:</strong> Used almost universally in large models where
+                                the model starts memorizing training data rather than generalizing to unseen data.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Recall Checkpoint -->
+            <section class="mb-24">
+                <div class="bg-neutral-900 rounded-[2.5rem] p-12 text-white shadow-2xl">
+                    <h2 class="text-3xl font-bold font-display mb-10">Active Recall Checkpoint</h2>
+                    <div class="space-y-8">
+                        <div class="flex gap-5">
+                            <span
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-brand-300">1</span>
+                            <div class="pt-1.5">
+                                <p class="text-xl font-medium">Data Transformation</p>
+                                <p class="text-slate-400 mt-2 text-sm italic">If you have a Conv2D layer outputting a
+                                    shape of (5, 5, 32), what is the shape of the data after passing it through a
+                                    Flatten layer?</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-5">
+                            <span
+                                class="flex-shrink-0 w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-brand-300">2</span>
+                            <div class="pt-1.5">
+                                <p class="text-xl font-medium">Combating Overfitting</p>
+                                <p class="text-slate-400 mt-2 text-sm italic">Why is Dropout only active during the
+                                    training phase, and automatically disabled during the evaluation/testing phase?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        <script>
+            // Micro-animations for section reveals
+            const observerOptions = { threshold: 0.1 };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('opacity-100', 'translate-y-0');
+                        entry.target.classList.remove('opacity-0', 'translate-y-4');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.add('transition-all', 'duration-700', 'opacity-0', 'translate-y-4');
+                observer.observe(section);
+            });
+        </script>
+    </div>
+</body>
+
+</html>

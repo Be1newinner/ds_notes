@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,8 +8,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
+
+    <!-- MathJax for rendering LaTeX math formulas -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+    </script>
     <script>
         tailwind.config = {
             theme: {
@@ -26,99 +40,103 @@
         }
     </script>
 </head>
+
 <body class="antialiased">
     <nav class="sidebar">
-    <div class="sidebar-header">
-        <div class="sidebar-title">Deep Learning</div>
-        <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
-    </div>
-    <ul class="nav-list">
-        <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
-                <span class="nav-number">4</span>
-                <span>Neural Networks Explained</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
-                <span class="nav-number">6</span>
-                <span>Frameworks Comparison</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
-                <span class="nav-number">7</span>
-                <span>Digits Classification</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 8.html" class="nav-item active">
-                <span class="nav-number">8</span>
-                <span>Activation Functions</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
-                <span class="nav-number">9</span>
-                <span>Derivatives Intuition</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
-                <span class="nav-number">10</span>
-                <span>Matrix Foundations</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
-                <span class="nav-number">11</span>
-                <span>Loss Functions</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
-                <span class="nav-number">12</span>
-                <span>Gradient Descent</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
-                <span class="nav-number">13</span>
-                <span>Python Implementation</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
-                <span class="nav-number">14</span>
-                <span>Optimizer Variants</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
-                <span class="nav-number">15</span>
-                <span>Chain Rule Mechanics</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
-                <span class="nav-number">16</span>
-                <span>Tensorboard Devtools</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
-                <span class="nav-number">17</span>
-                <span>GPU Performance</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
-                <span class="nav-number">18</span>
-                <span>Churn Prediction</span>
-            </a></li>
-        <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
-                <span class="nav-number">19</span>
-                <span>Evaluation Metrics</span>
-            </a></li>
-    </ul>
-</nav>
+        <div class="sidebar-header">
+            <div class="sidebar-title">Deep Learning</div>
+            <div class="text-xs text-slate-500 font-medium uppercase tracking-wider mt-1">Mastery Series</div>
+        </div>
+        <ul class="nav-list">
+            <li><a href="Deep Learning Tutorial 4.html" class="nav-item">
+                    <span class="nav-number">4</span>
+                    <span>Neural Networks Explained</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 6.html" class="nav-item">
+                    <span class="nav-number">6</span>
+                    <span>Frameworks Comparison</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 7.html" class="nav-item">
+                    <span class="nav-number">7</span>
+                    <span>Digits Classification</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 8.html" class="nav-item active">
+                    <span class="nav-number">8</span>
+                    <span>Activation Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 9.html" class="nav-item">
+                    <span class="nav-number">9</span>
+                    <span>Derivatives Intuition</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 10.html" class="nav-item">
+                    <span class="nav-number">10</span>
+                    <span>Matrix Foundations</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 11.html" class="nav-item">
+                    <span class="nav-number">11</span>
+                    <span>Loss Functions</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 12.html" class="nav-item">
+                    <span class="nav-number">12</span>
+                    <span>Gradient Descent</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 13.html" class="nav-item">
+                    <span class="nav-number">13</span>
+                    <span>Python Implementation</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 14.html" class="nav-item">
+                    <span class="nav-number">14</span>
+                    <span>Optimizer Variants</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 15.html" class="nav-item">
+                    <span class="nav-number">15</span>
+                    <span>Chain Rule Mechanics</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 16.html" class="nav-item">
+                    <span class="nav-number">16</span>
+                    <span>Tensorboard Devtools</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 17.html" class="nav-item">
+                    <span class="nav-number">17</span>
+                    <span>GPU Performance</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 18.html" class="nav-item">
+                    <span class="nav-number">18</span>
+                    <span>Churn Prediction</span>
+                </a></li>
+            <li><a href="Deep Learning Tutorial 19.html" class="nav-item">
+                    <span class="nav-number">19</span>
+                    <span>Evaluation Metrics</span>
+                </a></li>
+        </ul>
+    </nav>
     <div class="main-content">
         <header class="w-full py-16 md:py-24 px-6 text-center border-b border-white/10">
-    <div class="max-w-4xl mx-auto">
-        <span class="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-[0.2em] text-indigo-400 uppercase bg-indigo-500/10 rounded-full border border-indigo-500/20">
-            Tutorial 8
-        </span>
-        <h1 class="text-5xl md:text-7xl font-bold text-white tracking-tight leading-none mb-8">
-            Activation Functions Deep Dive <br />
-            <span class="gradient-text">Study Guide</span>
-        </h1>
-        <p class="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-12">
-            Understanding the non-linear engine of neural networks: From Sigmoid and Tanh to ReLU and Leaky ReLU.
-        </p>
-        <div class="flex flex-wrap justify-center gap-4">
-            <a href="https://www.youtube.com/watch?v=icZItWxw7AI" target="_blank" 
-               class="inline-flex items-center gap-3 px-8 py-4 bg-[#FF0000] text-white rounded-full font-bold hover:bg-[#CC0000] transition-all shadow-[0_8px_25px_-5px_rgba(255,0,0,0.4)] hover:shadow-[0_12px_30px_-5px_rgba(255,0,0,0.5)] hover:-translate-y-0.5 active:scale-95 group">
-                <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                </svg>
-                <span class="text-sm uppercase tracking-wider">Watch Video Tutorial</span>
-            </a>
-        </div>
-    </div>
-</header>
+            <div class="max-w-4xl mx-auto">
+                <span
+                    class="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-[0.2em] text-indigo-400 uppercase bg-indigo-500/10 rounded-full border border-indigo-500/20">
+                    Tutorial 8
+                </span>
+                <h1 class="text-5xl md:text-7xl font-bold text-white tracking-tight leading-none mb-8">
+                    Activation Functions Deep Dive <br />
+                    <span class="gradient-text">Study Guide</span>
+                </h1>
+                <p class="text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed mb-12">
+                    Understanding the non-linear engine of neural networks: From Sigmoid and Tanh to ReLU and Leaky
+                    ReLU.
+                </p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="https://www.youtube.com/watch?v=icZItWxw7AI" target="_blank"
+                        class="inline-flex items-center gap-3 px-8 py-4 bg-[#FF0000] text-white rounded-full font-bold hover:bg-[#CC0000] transition-all shadow-[0_8px_25px_-5px_rgba(255,0,0,0.4)] hover:shadow-[0_12px_30px_-5px_rgba(255,0,0,0.5)] hover:-translate-y-0.5 active:scale-95 group">
+                        <svg class="w-6 h-6 fill-current" viewBox="0 0 24 24">
+                            <path
+                                d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
+                        </svg>
+                        <span class="text-sm uppercase tracking-wider">Watch Video Tutorial</span>
+                    </a>
+                </div>
+            </div>
+        </header>
         <main class="container mx-auto px-6 -mt-10 pb-20">
             <div class="max-w-4xl mx-auto space-y-12">
 
@@ -131,7 +149,8 @@
                     <p class="text-lg text-neutral-700 leading-relaxed">
                         This guide explores the fundamental role of activation functions in neural networks. Without
                         them, a neural network is just a linear regression model. We cover <strong>Sigmoid, tanh, ReLU,
-                            and Leaky ReLU</strong>, along with their mathematical derivatives which are crucial for
+                            Leaky ReLU, and Softmax</strong>, along with their mathematical derivatives which are
+                        crucial for
                         backpropagation.
                     </p>
                 </section>
@@ -144,30 +163,120 @@
                         Technical Deep Dive: Math & Gradients</h2>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
-                            <h4 class="font-bold text-brand-800 mb-3">Sigmoid ($\sigma$)</h4>
-                            <p class="text-sm text-slate-600 mb-3">$\sigma(x) = \frac{1}{1 + e^{-x}}$</p>
-                            <p class="text-xs font-mono text-slate-500">Derivative: $\sigma(x)(1 - \sigma(x))$</p>
-                            <p class="mt-2 text-xs text-slate-400">Pro: Range (0,1). Con: Vanishing Gradients.</p>
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 flex flex-col h-full shadow-sm">
+                            <h4 class="font-bold text-brand-800 mb-2 text-lg">Sigmoid ($\sigma$)</h4>
+                            <p class="text-sm text-slate-700 mb-4 leading-relaxed">
+                                Maps any input value to a probability between 0 and 1. It acts as an "S-shaped"
+                                squashing function, pushing large positive values close to 1 and large negative values
+                                close to 0. While historically popular, it suffers from the <strong>vanishing
+                                    gradient</strong> problem where learning halts if inputs are too extreme because the
+                                curve becomes flat.
+                            </p>
+                            <div class="bg-white p-3 rounded border border-slate-100 mb-4">
+                                <p class="text-sm text-slate-600 mb-2"><strong>Formula:</strong> $\sigma(x) = \frac{1}{1
+                                    + e^{-x}}$</p>
+                                <p class="text-xs font-mono text-slate-500">Derivative: $\sigma(x)(1 - \sigma(x))$</p>
+                            </div>
+                            <div class="mt-auto pt-4 border-t border-slate-200">
+                                <p class="text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">When to use:
+                                </p>
+                                <p class="text-sm text-slate-600 font-medium">Output layer for binary classification.
+                                </p>
+                                <p class="text-xs text-slate-500 mt-1">Avoid in hidden layers due to vanishing
+                                    gradients.</p>
+                            </div>
                         </div>
-                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
-                            <h4 class="font-bold text-brand-800 mb-3">Tanh</h4>
-                            <p class="text-sm text-slate-600 mb-3">$tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}$</p>
-                            <p class="text-xs font-mono text-slate-500">Derivative: $1 - tanh^2(x)$</p>
-                            <p class="mt-2 text-xs text-slate-400">Pro: Zero-centered. Con: Vanishing Gradients.</p>
+
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 flex flex-col h-full shadow-sm">
+                            <h4 class="font-bold text-brand-800 mb-2 text-lg">Tanh</h4>
+                            <p class="text-sm text-slate-700 mb-4 leading-relaxed">
+                                Similar to Sigmoid, but it squashes inputs into a range between -1 and 1. This
+                                <strong>zero-centered</strong> nature usually makes optimization easier and helps
+                                networks converge faster than Sigmoid. However, it still falls prey to the vanishing
+                                gradient problem at extreme values.
+                            </p>
+                            <div class="bg-white p-3 rounded border border-slate-100 mb-4">
+                                <p class="text-sm text-slate-600 mb-2"><strong>Formula:</strong> $tanh(x) = \frac{e^x -
+                                    e^{-x}}{e^x + e^{-x}}$</p>
+                                <p class="text-xs font-mono text-slate-500">Derivative: $1 - tanh^2(x)$</p>
+                            </div>
+                            <div class="mt-auto pt-4 border-t border-slate-200">
+                                <p class="text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">When to use:
+                                </p>
+                                <p class="text-sm text-slate-600 font-medium">Hidden layers in Recurrent Neural Networks
+                                    (RNNs).</p>
+                                <p class="text-xs text-slate-500 mt-1">Generally preferred over Sigmoid for hidden
+                                    layers.</p>
+                            </div>
                         </div>
-                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
-                            <h4 class="font-bold text-brand-800 mb-3">ReLU</h4>
-                            <p class="text-sm text-slate-600 mb-3">$f(x) = max(0, x)$</p>
-                            <p class="text-xs font-mono text-slate-500">Derivative: $1$ if $x > 0$, else $0$</p>
-                            <p class="mt-2 text-xs text-slate-400">Pro: Fast, no vanishing gradients for $x>0$. Con:
-                                Dying ReLU.</p>
+
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 flex flex-col h-full shadow-sm">
+                            <h4 class="font-bold text-brand-800 mb-2 text-lg">ReLU (Rectified Linear Unit)</h4>
+                            <p class="text-sm text-slate-700 mb-4 leading-relaxed">
+                                The undisputed default for deep learning. It simply outputs 0 if the input is negative,
+                                and passes the input straight through if positive. This piecewise linearity allows for
+                                extremely fast computation and mitigates vanishing gradients for positive values. Its
+                                main drawback is the <strong>"Dying ReLU"</strong> problem.
+                            </p>
+                            <div class="bg-white p-3 rounded border border-slate-100 mb-4">
+                                <p class="text-sm text-slate-600 mb-2"><strong>Formula:</strong> $f(x) = max(0, x)$</p>
+                                <p class="text-xs font-mono text-slate-500">Derivative: $1$ if $x > 0$, else $0$</p>
+                            </div>
+                            <div class="mt-auto pt-4 border-t border-slate-200">
+                                <p class="text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">When to use:
+                                </p>
+                                <p class="text-sm text-slate-600 font-medium">Default choice for hidden layers.</p>
+                                <p class="text-xs text-slate-500 mt-1">Used universally in CNNs and standard Feedforward
+                                    networks.</p>
+                            </div>
                         </div>
-                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200">
-                            <h4 class="font-bold text-brand-800 mb-3">Leaky ReLU</h4>
-                            <p class="text-sm text-slate-600 mb-3">$f(x) = max(0.01x, x)$</p>
-                            <p class="text-xs font-mono text-slate-500">Derivative: $1$ if $x > 0$, else $0.01$</p>
-                            <p class="mt-2 text-xs text-slate-400">Pro: Fixes "Dying ReLU" problem.</p>
+
+                        <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 flex flex-col h-full shadow-sm">
+                            <h4 class="font-bold text-brand-800 mb-2 text-lg">Leaky ReLU</h4>
+                            <p class="text-sm text-slate-700 mb-4 leading-relaxed">
+                                A straightforward fix to the Dying ReLU problem. Instead of outputting a hard 0 for
+                                negative inputs, it allows a small, non-zero gradient (e.g., $0.01x$). This ensures that
+                                neurons with negative inputs can still learn and update their weights during
+                                backpropagation, keeping the entire network actively participating.
+                            </p>
+                            <div class="bg-white p-3 rounded border border-slate-100 mb-4">
+                                <p class="text-sm text-slate-600 mb-2"><strong>Formula:</strong> $f(x) = max(0.01x, x)$
+                                </p>
+                                <p class="text-xs font-mono text-slate-500">Derivative: $1$ if $x > 0$, else $0.01$</p>
+                            </div>
+                            <div class="mt-auto pt-4 border-t border-slate-200">
+                                <p class="text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">When to use:
+                                </p>
+                                <p class="text-sm text-slate-600 font-medium">When standard ReLU causes a "dead
+                                    network".</p>
+                                <p class="text-xs text-slate-500 mt-1">Use if your network stops learning because too
+                                    many ReLU neurons output 0.</p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="bg-slate-50 p-6 rounded-xl border border-slate-200 flex flex-col h-full shadow-sm md:col-span-2">
+                            <h4 class="font-bold text-brand-800 mb-2 text-lg">Softmax</h4>
+                            <p class="text-sm text-slate-700 mb-4 leading-relaxed">
+                                Softmax takes a vector of raw prediction scores (logits) and normalizes them into a
+                                proper probability distribution. Every output value falls exactly between 0 and 1, and
+                                the entire set of outputs perfectly sums to $1.0$. It heavily penalizes incorrect
+                                classes while exponentially rewarding the highest scoring class.
+                            </p>
+                            <div class="bg-white p-3 rounded border border-slate-100 mb-4">
+                                <p class="text-sm text-slate-600 mb-2"><strong>Formula:</strong> $S(x_i) =
+                                    \frac{e^{x_i}}{\sum_j e^{x_j}}$</p>
+                                <p class="text-xs font-mono text-slate-500">Derivative: $S(x_i)(\delta_{ij} - S(x_j))$
+                                </p>
+                            </div>
+                            <div class="mt-auto pt-4 border-t border-slate-200">
+                                <p class="text-xs font-bold text-slate-700 uppercase tracking-wide mb-1">When to use:
+                                </p>
+                                <p class="text-sm text-slate-600 font-medium">Output layer for multi-class
+                                    classification.</p>
+                                <p class="text-xs text-slate-500 mt-1">When you need the network to select exactly one
+                                    class from three or more options.</p>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -178,8 +287,11 @@
                     <h2
                         class="text-2xl md:text-3xl font-display font-bold text-neutral-900 mb-8 uppercase tracking-tight">
                         Technical Execution</h2>
-                    <div class="code-block">
-                        <pre><code class="font-mono text-sm leading-relaxed"><span class="text-brand-500">import</span> numpy <span class="text-brand-500">as</span> np
+                    <div class="grid grid-cols-1 gap-6">
+                        <div class="code-block bg-slate-900 rounded-xl p-6 overflow-x-auto">
+                            <h3 class="text-white font-bold mb-4 flex items-center gap-2"><span
+                                    class="text-brand-400">#</span> Numpy Implementation (Under the Hood)</h3>
+                            <pre><code class="font-mono text-sm leading-relaxed"><span class="text-brand-500">import</span> numpy <span class="text-brand-500">as</span> np
 
 <span class="text-gray-500"># Numpy vectorized implementations</span>
 <span class="text-brand-500">def</span> <span class="text-yellow-400">sigmoid</span>(x):
@@ -191,10 +303,41 @@
 <span class="text-brand-500">def</span> <span class="text-yellow-400">leaky_relu</span>(x, alpha=0.01):
     <span class="text-brand-500">return</span> np.where(x > 0, x, alpha * x)
 
+<span class="text-brand-500">def</span> <span class="text-yellow-400">softmax</span>(x):
+    e_x = np.exp(x - np.max(x)) <span class="text-gray-500"># subtract max for numerical stability</span>
+    <span class="text-brand-500">return</span> e_x / e_x.sum(axis=-1, keepdims=True)
+
 <span class="text-gray-500"># Example of "Dying ReLU" visualization</span>
 inputs = np.array([-10, -5, 0, 5, 10])
 print(<span class="text-green-400">f"ReLU Output: {relu(inputs)}"</span>) 
 <span class="text-gray-500"># Result: [0 0 0 5 10] - Notice the first three inputs are "dead"</span></code></pre>
+                        </div>
+
+                        <div class="code-block bg-slate-900 rounded-xl p-6 overflow-x-auto">
+                            <h3 class="text-white font-bold mb-4 flex items-center gap-2"><span
+                                    class="text-brand-400">#</span> Keras Implementation (Production)</h3>
+                            <pre><code class="font-mono text-sm leading-relaxed"><span class="text-brand-500">from</span> keras.layers <span class="text-brand-500">import</span> Dense, LeakyReLU
+
+<span class="text-gray-500"># 1. Sigmoid: Usually the final layer for Binary Classification</span>
+output_layer = Dense(units=1, activation=<span class="text-green-400">'sigmoid'</span>)
+
+<span class="text-gray-500"># 2. Tanh: Used in RNNs or when negative outputs are needed</span>
+rnn_dense = Dense(units=64, activation=<span class="text-green-400">'tanh'</span>)
+
+<span class="text-gray-500"># 3. ReLU: The default choice for almost all hidden layers</span>
+hidden_layer = Dense(units=128, activation=<span class="text-green-400">'relu'</span>)
+
+<span class="text-gray-500"># 4. Leaky ReLU: Can be passed as a string in Keras 3 or used as a separate layer</span>
+<span class="text-gray-500"># Method A:</span>
+leaky_layer = Dense(units=128, activation=<span class="text-green-400">'leaky_relu'</span>) 
+
+<span class="text-gray-500"># Method B (Advanced):</span>
+dense_base = Dense(units=128)(inputs)
+leaky_out = LeakyReLU(alpha=0.01)(dense_base)
+
+<span class="text-gray-500"># 5. Softmax: Final layer for Multi-class Classification</span>
+multiclass_output = Dense(units=10, activation=<span class="text-green-400">'softmax'</span>)</code></pre>
+                        </div>
                     </div>
                 </section>
 
@@ -238,4 +381,5 @@ print(<span class="text-green-400">f"ReLU Output: {relu(inputs)}"</span>)
         </script>
     </div>
 </body>
+
 </html>
