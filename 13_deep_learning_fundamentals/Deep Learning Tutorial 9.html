@@ -145,14 +145,13 @@
 
                 <div class="space-y-8">
                     <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
-                        <h3 class="text-xl font-bold text-brand-700 mb-4">1. The Gradient Vector ($\nabla f$)</h3>
+                        <h3 class="text-xl font-bold text-brand-700 mb-4">1. The Gradient Vector (∇f)</h3>
                         <p class="text-slate-600 mb-4">In deep learning, we don't just have one derivative. We have a
                             <strong>Gradient Vector</strong>, which is a vector containing the partial derivatives for
-                            every weight ($w$) and bias ($b$) in the network.
+                            every weight (w) and bias (b) in the network.
                         </p>
                         <div class="bg-slate-50 p-4 rounded-xl font-mono text-sm text-brand-800 text-center">
-                            $\nabla f = [\frac{\partial f}{\partial w_1}, \frac{\partial f}{\partial w_2}, \dots,
-                            \frac{\partial f}{\partial b}]$
+                            ∇f = [∂f/∂w<sub>1</sub>, ∂f/∂w<sub>2</sub>, ..., ∂f/∂b]
                         </div>
                         <p class="mt-4 text-sm text-slate-500 italic text-center">The gradient points in the direction
                             of the steepest ASCENT. We move in the opposite direction (Gradient Descent).</p>
@@ -161,20 +160,19 @@
                     <div class="p-8 bg-white border border-slate-200 rounded-3xl shadow-sm">
                         <h3 class="text-xl font-bold text-brand-700 mb-4">2. The Chain Rule: Nested Dependencies</h3>
                         <p class="text-slate-600 mb-4">Neural networks are layers of nested functions:
-                            $Loss(Activation(WeightedSum(Input)))$. To find the derivative of the Loss with respect to
+                            Loss(Activation(WeightedSum(Input))). To find the derivative of the Loss with respect to
                             an early weight, we must multiply the derivatives of each step.</p>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="p-4 bg-brand-50 rounded-xl border border-brand-100">
-                                <h4 class="font-bold text-xs uppercase mb-2">Example: $y = sin(x^2)$</h4>
-                                <p class="text-xs">Let $u = x^2$ and $y = sin(u)$</p>
-                                <p class="text-xs font-bold mt-2">$\frac{dy}{dx} = \frac{dy}{du} \cdot \frac{du}{dx}$
+                                <h4 class="font-bold text-xs uppercase mb-2">Example: y = sin(x<sup>2</sup>)</h4>
+                                <p class="text-xs">Let u = x<sup>2</sup> and y = sin(u)</p>
+                                <p class="text-xs font-bold mt-2">dy/dx = dy/du · du/dx
                                 </p>
-                                <p class="text-xs mt-1">$= cos(u) \cdot 2x = 2x \cdot cos(x^2)$</p>
+                                <p class="text-xs mt-1">= cos(u) · 2x = 2x · cos(x<sup>2</sup>)</p>
                             </div>
                             <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100">
                                 <h4 class="font-bold text-xs uppercase mb-2">Deep Learning Mapping</h4>
-                                <p class="text-xs">$\frac{\partial Loss}{\partial w} = \frac{\partial Loss}{\partial
-                                    Output} \cdot \frac{\partial Output}{\partial w}$</p>
+                                <p class="text-xs">∂Loss/∂w = ∂Loss/∂Output · ∂Output/∂w</p>
                                 <p class="text-xs mt-4 text-slate-500 italic">This is the heart of Backpropagation.</p>
                             </div>
                         </div>

@@ -147,7 +147,7 @@
                             we ensure the function is <strong>convex</strong> (bowl-shaped), which guarantees that
                             Gradient Descent will eventually find the global minimum.</p>
                         <div class="bg-slate-50 p-4 rounded-xl font-mono text-sm text-center">
-                            $J(w, b) = \frac{1}{2m} \sum_{i=1}^{m} (\hat{y}^{(i)} - y^{(i)})^2$
+                            J(w, b) = (1 / 2m) Σ<sub>i=1..m</sub> (ŷ<sup>(i)</sup> - y<sup>(i)</sup>)<sup>2</sup>
                         </div>
                     </div>
 
@@ -157,7 +157,7 @@
                             activation, MSE results in a <strong>non-convex</strong> cost function with many local
                             minima. Log Loss restores convexity for classification.</p>
                         <div class="bg-brand-50 p-4 rounded-xl font-mono text-sm text-center">
-                            $Loss = -(y \log(\hat{y}) + (1-y) \log(1-\hat{y}))$
+                            Loss = -(y · log(ŷ) + (1 - y) · log(1 - ŷ))
                         </div>
                     </div>
 

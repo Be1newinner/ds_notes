@@ -147,9 +147,7 @@
                             output changes relative to its input). Backprop multiplies this local gradient by the
                             "Upstream Gradient" flowing back from the error.</p>
                         <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100 text-center font-mono text-sm">
-                            $\frac{\partial Loss}{\partial w} = \underbrace{\frac{\partial Loss}{\partial
-                            y}}_{\text{Upstream}} \times \underbrace{\frac{\partial y}{\partial z}}_{\text{Activation}}
-                            \times \underbrace{\frac{\partial z}{\partial w}}_{\text{Local}}$
+                            ∂Loss / ∂w = (∂Loss / ∂y)<sub>Upstream</sub> × (∂y / ∂z)<sub>Activation</sub> × (∂z / ∂w)<sub>Local</sub>
                         </div>
                     </div>
 
@@ -203,9 +201,7 @@ dL_dw = dL_de * de_dyhat * dyhat_dw <span class="text-slate-500"># 4.0 * -1 * 10
                         </div>
                         <div class="p-6 bg-white/5 rounded-xl border border-white/10">
                             <p class="font-bold text-brand-secondary">Calculus Intuition</p>
-                            <p class="text-slate-400 text-sm italic">In the chain rule $\frac{dy}{dx} = \frac{dy}{du}
-                                \cdot \frac{du}{dx}$, which part represents the "hidden layer" and which part represents
-                                the "output"?</p>
+                            <p class="text-slate-400 text-sm italic">In the chain rule dy/dx = dy/du · du/dx, which part represents the "hidden layer" and which part represents the "output"?</p>
                         </div>
                     </div>
                 </div>

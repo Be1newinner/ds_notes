@@ -167,14 +167,13 @@
                         <p class="text-slate-600 mb-4">Learning is a two-stroke engine:</p>
                         <ul class="space-y-3">
                             <li class="flex items-start gap-3">
-                                <span class="font-bold text-accent-teal">Forward:</span> Prediction = $\sigma(\sum w_i
-                                x_i + b)$. This is essentially a giant matrix multiplication followed by a non-linear
+                                <span class="font-bold text-accent-teal">Forward:</span> Prediction = σ(Σ w<sub>i</sub> x<sub>i</sub> + b). This is essentially a giant matrix multiplication followed by a non-linear
                                 "squashing" function.
                             </li>
                             <li class="flex items-start gap-3">
                                 <span class="font-bold text-accent-teal">Backward:</span> We use the <strong>Chain
                                     Rule</strong> to walk back from the error to every weight. The weight is updated by
-                                $w = w - \eta \frac{\partial Loss}{\partial w}$.
+                                w = w - η · (∂Loss / ∂w).
                             </li>
                         </ul>
                     </div>
