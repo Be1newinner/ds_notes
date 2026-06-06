@@ -1,0 +1,8 @@
+PROMPT 1:
+Give lesson_30 in depth notes with examples and expected output
+
+
+PROMPT 2:
+CREATE A TASK FILE AND ADD FOLLOWING THEN EXECUTE AI
+Give lesson_8 to lesson_30 in depth notes with examples and expected output
+add these tasks one by one
