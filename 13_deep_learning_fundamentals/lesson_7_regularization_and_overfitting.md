@@ -33,6 +33,41 @@ $$w_{t+1} = w_t - \eta \frac{\partial \mathcal{L}_0}{\partial w_t} - \eta\lambda
 
 Unlike L2, which decays weights proportionally to their size (meaning small weights decay very slowly), L1 subtracts a constant term $\eta\lambda$ from the magnitude of the weight regardless of its size. This constantly pushes weights toward zero, driving small weights to exactly $0.0$ and creating a **sparse weight matrix**.
 
+### Python Code Implementation
+Here is a Python example implementing both L1 and L2 weight decay updates from scratch, demonstrating how L1 drives weights to zero while L2 shrinks them:
+
+```python
+import numpy as np
+
+def l2_decay_update(w, grad, lr=0.1, lam=0.1):
+    # w_new = (1 - 2 * lr * lam) * w - lr * grad
+    decay_factor = 1.0 - 2.0 * lr * lam
+    return decay_factor * w - lr * grad
+
+def l1_decay_update(w, grad, lr=0.1, lam=0.1):
+    # w_new = w - lr * grad - lr * lam * sgn(w)
+    w_new = w - lr * grad - lr * lam * np.sign(w)
+    
+    # If the sign flips due to the L1 update, clip the weight to 0.0 to enforce sparsity
+    was_positive = w > 0
+    is_positive_now = w_new > 0
+    if was_positive != is_positive_now:
+        w_new = 0.0
+    return w_new
+
+# Let's run updates on a small weight
+w_l2 = 0.05
+w_l1 = 0.05
+grad = 0.01  # Small unregularized gradient
+
+print("Step | L2 Weight | L1 Weight")
+print("----------------------------")
+for step in range(1, 6):
+    w_l2 = l2_decay_update(w_l2, grad, lr=0.1, lam=0.2)
+    w_l1 = l1_decay_update(w_l1, grad, lr=0.1, lam=0.2)
+    print(f"{step:4d} | {w_l2:9.5f} | {w_l1:9.5f}")
+```
+
 ### Trade-offs
 Weight decay restricts the model's capacity by penalizing extreme parameter values. 
 - **L2 Regularization** keeps all weights small, distributing representation across features. It is smooth and differentiable, making optimization stable.
@@ -76,18 +111,39 @@ $$\hat{a}_j = a_j \cdot r_j$$
 In modern deep learning libraries, we implement **Inverted Dropout**. To avoid having to scale the activations during inference when dropout is deactivated, we scale the active activations *during training* by dividing by the survival probability $1-p$:
 $$\hat{a}_j = \frac{a_j \cdot r_j}{1 - p}$$
 
-```
-         Standard Dense Layer                   Dense Layer with Dropout (p = 0.5)
-         
-               ( Neurons )                             ( Neurons )
-                o   o   o                               x   o   x   (x = dropped)
-               / \ / \ / \                             / \ / \ / \
-              o   o   o   o                           o   x   o   x
-```
-
 At test time, the Dropout layer is completely deactivated:
 $$\hat{a}_{\text{test}} = a_{\text{test}}$$
 Because the activations were pre-scaled during training, no modification is needed during inference, and the network behaves normally.
+
+### Python Code Implementation
+Here is a Python function implementing Inverted Dropout, showing how activations are masked and scaled during training but left unchanged during testing:
+
+```python
+import numpy as np
+
+def inverted_dropout(a, p, training=True):
+    if training:
+        # Generate a binary mask: 1 with probability 1-p, 0 with probability p
+        mask = (np.random.rand(*a.shape) >= p).astype(float)
+        # Apply mask and scale activations
+        return (a * mask) / (1.0 - p)
+    else:
+        # Do nothing during inference
+        return a
+
+# Test our dropout function
+np.random.seed(42)
+hidden_outputs = np.array([1.5, 2.0, 3.5, 4.0, 0.5])
+print("Original Activations :", hidden_outputs)
+
+# Simulate training pass with 40% dropout rate
+train_pass = inverted_dropout(hidden_outputs, p=0.4, training=True)
+print("Training Pass Output :", train_pass)
+
+# Simulate testing pass (dropout disabled)
+test_pass = inverted_dropout(hidden_outputs, p=0.4, training=False)
+print("Testing Pass Output  :", test_pass)
+```
 
 ### Trade-offs
 Dropout prevents **co-adaptation**. In standard networks, neighboring neurons can develop codependency: a neuron might learn a feature that only works if another specific neuron is active. By randomly removing neurons, Dropout forces each unit to learn robust, independent features that work in combination with many different random subsets of other units.
@@ -118,18 +174,6 @@ The trade-off is training time. Since the active architecture changes at every s
 ### Rationale and Mechanics
 During training, the loss on the training dataset decreases continuously as the model updates its weights. However, the loss on the validation dataset (which is not used for training) typically follows a U-shaped curve: it decreases initially as the model learns general patterns, but starts to increase once the model begins to overfit and memorize training noise.
 
-```
-       Loss
-        ^
-        |      / Validation Loss (Overfitting starts)
-        |    / \_
-        |  /     \__
-        |/          \________ Training Loss
-        +-----------------------------> Epochs
-                 |
-           Stop Training Here
-```
-
 **Early Stopping** is a regularization technique that monitors validation performance and halts training at the point where validation loss is minimized.
 
 Under the hood, the algorithm operates at the end of each epoch:
@@ -138,6 +182,44 @@ Under the hood, the algorithm operates at the end of each epoch:
 3. If $V_t < V_{\text{best}}$, it updates $V_{\text{best}} = V_t$ and saves the current model weights $\theta_{\text{best}}$.
 4. If $V_t \geq V_{\text{best}}$, it increments an inactivity counter.
 5. If the validation loss fails to improve for a consecutive number of epochs equal to a hyperparameter called **patience** ($P$), the training loop is halted, and the saved weights $\theta_{\text{best}}$ are restored.
+
+### Python Code Implementation
+Here is a Python script illustrating how to write an EarlyStopping controller from scratch:
+
+```python
+class EarlyStoppingScratch:
+    def __init__(self, patience=3):
+        self.patience = patience
+        self.best_loss = float('inf')
+        self.counter = 0
+        self.stop_training = False
+        self.best_weights = None
+
+    def step(self, val_loss, current_weights):
+        # Check if validation loss improved
+        if val_loss < self.best_loss:
+            print(f"Validation loss improved from {self.best_loss:.4f} to {val_loss:.4f}. Saving weights.")
+            self.best_loss = val_loss
+            self.counter = 0
+            self.best_weights = current_weights.copy()
+        else:
+            self.counter += 1
+            print(f"Validation loss did not improve. Counter: {self.counter}/{self.patience}")
+            if self.counter >= self.patience:
+                self.stop_training = True
+                print("Early stopping triggered! Restoring best weights.")
+
+# Simulate training epochs
+controller = EarlyStoppingScratch(patience=3)
+simulated_val_losses = [0.52, 0.48, 0.45, 0.46, 0.47, 0.49]
+dummy_weights = {"w1": 0.5}
+
+for epoch, loss in enumerate(simulated_val_losses):
+    print(f"\nEpoch {epoch+1}:")
+    controller.step(loss, dummy_weights)
+    if controller.stop_training:
+        break
+```
 
 ### Trade-offs
 Early Stopping is computationally efficient and requires no changes to the model architecture or loss function. It prevents unnecessary training epochs, saving time and cloud computing costs.

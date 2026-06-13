@@ -35,8 +35,37 @@ model = keras.Model(inputs=inputs, outputs=outputs)
 
 Keras builds the network topology by tracing the symbolic connections from the specified `inputs` to the `outputs`. This network is represented as a **Directed Acyclic Graph (DAG)**, where nodes represent operations (layers) and edges represent the flow of tensors.
 
-```
-       [Input Layer] --(inputs tensor)--> [Dense Layer 1] --(x tensor)--> [Dense Layer 2] --(outputs tensor)--> [Output]
+### Python Code Implementation
+Here is a Python script illustrating the architectural equivalence between the Sequential API and the Functional API, verifying they build models with the exact same parameter structure:
+
+```python
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# 1. Build a simple feedforward network using Sequential API
+seq_model = keras.Sequential([
+    layers.Input(shape=(10,)),
+    layers.Dense(32, activation='relu'),
+    layers.Dense(1, activation='sigmoid')
+])
+
+# 2. Build the equivalent network using Functional API
+inputs = layers.Input(shape=(10,))
+x = layers.Dense(32, activation='relu')(inputs)
+outputs = layers.Dense(1, activation='sigmoid')(x)
+func_model = keras.Model(inputs=inputs, outputs=outputs)
+
+# Output summary comparison
+print("--- Sequential API Parameter Count ---")
+print("Total Params:", seq_model.count_params())
+
+print("\n--- Functional API Parameter Count ---")
+print("Total Params:", func_model.count_params())
+
+# Verify they match
+assert seq_model.count_params() == func_model.count_params(), "Parameters do not match!"
+print("\nValidation Succeeded: Both models are structurally identical.")
 ```
 
 ### Trade-offs
@@ -102,13 +131,65 @@ merged_features = keras.layers.concatenate([tabular_features, image_features])
 The `concatenate` operation joins tensors along a specified axis. For two 2D tensors of shapes $(B, D)$ and $(B, F)$, the concatenation along the feature axis (axis -1) yields a single tensor of shape:
 $$\text{Output Shape} = (B, D + F)$$
 
-```
-       Tabular Input (B, D) -------> [Dense Branch] ------> (B, H1) ---\
-                                                                       ======> [Concatenate] ===> (B, H1 + H2) ---> [Dense Output]
-       Image Input (B, H, W, C) ---> [Conv Branch] ------> (B, H2) ---/
-```
-
 This fused representation is then passed to downstream dense layers to make the final prediction.
+
+### Python Code Implementation
+Here is a Python script demonstrating how to construct, compile, and train a Multi-Input model in Keras using synthetic tabular and image-like data:
+
+```python
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# 1. Generate synthetic data
+# 100 samples, 5 tabular features
+X_tabular = np.random.randn(100, 5)
+# 100 samples, 16x16 grayscale images
+X_images = np.random.randn(100, 16, 16, 1)
+# Target: binary labels
+y = np.random.randint(0, 2, size=(100, 1))
+
+# 2. Design the Multi-Input model
+tabular_input = layers.Input(shape=(5,), name='tabular_input')
+image_input = layers.Input(shape=(16, 16, 1), name='image_input')
+
+# Tabular processing branch
+x_tab = layers.Dense(16, activation='relu')(tabular_input)
+
+# Image processing branch (Simple CNN representation)
+x_img = layers.Conv2D(8, kernel_size=(3, 3), activation='relu')(image_input)
+x_img = layers.Flatten()(x_img)
+x_img = layers.Dense(16, activation='relu')(x_img)
+
+# Combine representations
+merged = layers.concatenate([x_tab, x_img], name='feature_fusion')
+
+# Output branch
+outputs = layers.Dense(1, activation='sigmoid', name='prediction')(merged)
+
+# Model instantiation
+multimodal_model = keras.Model(inputs=[tabular_input, image_input], outputs=outputs)
+
+# Compile the model
+multimodal_model.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+
+# Inspect the topology
+multimodal_model.summary()
+
+# Train the model by passing a list of inputs
+print("\n--- Starting Model Training ---")
+history = multimodal_model.fit(
+    [X_tabular, X_images], y,
+    epochs=3,
+    batch_size=16,
+    verbose=1
+)
+```
 
 ### Trade-offs
 Multi-input models allow the network to learn interactions between different data modalities, significantly improving performance over models trained on a single source.
@@ -177,16 +258,6 @@ $$\mathcal{L}_{\text{total}} = w_{\text{price}} \mathcal{L}_{\text{price}} + w_{
 The Functional API also allows us to build **Skip Connections** (or residual connections). In deep networks, gradients decay as they backpropagate through layers. A skip connection bypasses one or more layers, adding the input directly to the output:
 $$\mathbf{y} = f(\mathbf{x}) + \mathbf{x}$$
 
-```
-                x -------\
-                |        |
-            [Layer]      | (Skip Path)
-                |        |
-             f(x)        |
-                \       /
-                 [ Add ] ===> f(x) + x
-```
-
 We implement this in Keras using the `Add` layer:
 ```python
 x = keras.layers.Dense(32, activation='relu')(inputs)
@@ -195,6 +266,63 @@ x = keras.layers.add([x, inputs])
 outputs = keras.layers.Activation('relu')(x)
 ```
 During backpropagation, the gradient flows directly through the addition operation to the earlier layers without decay, enabling the training of networks with hundreds of layers.
+
+### Python Code Implementation
+Here is a Python script implementing a model that features a residual skip connection and branches into two output heads (one regression output and one multi-class output):
+
+```python
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# 1. Define input (8 features)
+inputs = layers.Input(shape=(8,), name='network_input')
+
+# Hidden layer 1
+x = layers.Dense(8, activation='relu', name='dense_1')(inputs)
+
+# Skip connection: add input vector directly to the output of dense_1
+# Both must have the same dimension (8,)
+shortcut = layers.add([x, inputs], name='residual_addition')
+x = layers.Activation('relu', name='residual_activation')(shortcut)
+
+# 2. Branch into two output heads
+regression_output = layers.Dense(1, name='reg_output')(x)
+classification_output = layers.Dense(3, activation='softmax', name='class_output')(x)
+
+# 3. Create model
+multi_task_model = keras.Model(inputs=inputs, outputs=[regression_output, classification_output])
+
+# 4. Compile with target-specific loss functions and weights
+multi_task_model.compile(
+    optimizer='adam',
+    loss={
+        'reg_output': 'mse',
+        'class_output': 'sparse_categorical_crossentropy'
+    },
+    loss_weights={
+        'reg_output': 1.0,
+        'class_output': 0.5
+    }
+)
+
+multi_task_model.summary()
+
+# 5. Dummy training run
+X_dummy = np.random.randn(100, 8)
+y_reg = np.random.randn(100, 1)
+y_class = np.random.randint(0, 3, size=(100, 1))
+
+print("\n--- Training Multi-Task Model ---")
+multi_task_model.fit(
+    X_dummy,
+    {'reg_output': y_reg, 'class_output': y_class},
+    epochs=3,
+    batch_size=16,
+    verbose=1
+)
+```
 
 ### Trade-offs
 - **Multi-Output Trade-off:** Multi-task learning acts as a regularizer, forcing the network to learn generalized features in the shared layers. However, tuning the loss weights $w_i$ is difficult. If one weight is too large, the optimizer will focus on that task and ignore the others.

@@ -22,24 +22,43 @@ $$\text{Input Features} = H \times W \times C = 256 \times 256 \times 3 = 196,60
 
 If we connect this input to a single, modest hidden layer containing $1,000$ units, the weight matrix $\mathbf{W}$ must store:
 $$\text{Params} = 196,608 \times 1,000 = 196,608,000 \text{ weights}$$
-Over 196 million parameters for just the first layer! 
-
-```
-        Dense Layer (MLP): Parameter Explosion
-        
-        Input Image (256x256x3)                         Hidden Layer
-        [ Pixel 1 ] -----------------------------\----> [ Neuron 1 ]
-        [ Pixel 2 ] -----------------------\----/-----> [ Neuron 2 ]
-        [  ...    ]                         \  /
-        [ Pixel 196608 ] --------------------\--------> [ Neuron 1000 ]
-        
-        Total connections: 196,608,000 (every pixel connected to every neuron)
-```
+Over 196 million parameters for just the first layer!
 
 This parameter explosion causes three major failures:
 1. **Overfitting:** The model has so much capacity that it will easily memorize the exact pixel locations of the training images rather than learning general shapes.
 2. **Computational Overhead:** Storing and updating 196 million weights requires massive GPU memory and slows down training.
 3. **Loss of Translation Invariance:** If the model learns to recognize a cat in the top-left corner, it will not recognize the same cat in the bottom-right corner. The model must learn the cat's features all over again for every pixel location because the weights connected to the top-left pixels are independent of the weights connected to the bottom-right pixels.
+
+### Python Code Implementation
+Here is a Python script demonstrating the math behind parameter counts for a Dense layer vs. a Conv2D layer, showing how CNNs prevent parameter explosion:
+
+```python
+def count_dense_params(img_h, img_w, img_c, units):
+    inputs = img_h * img_w * img_c
+    weights = inputs * units
+    biases = units
+    return weights + biases
+
+def count_conv2d_params(kernel_size, img_c, filters):
+    # Each filter has kernel_size * kernel_size * img_c weights, plus 1 bias
+    weights_per_filter = kernel_size * kernel_size * img_c
+    biases_per_filter = 1
+    return filters * (weights_per_filter + biases_per_filter)
+
+# Image details: 256x256 RGB
+h, w, c = 256, 256, 3
+dense_neurons = 1000
+conv_filters = 32
+k = 3  # 3x3 kernel
+
+dense_params = count_dense_params(h, w, c, dense_neurons)
+conv_params = count_conv2d_params(k, c, conv_filters)
+
+print(f"--- Parameter Count Comparison (256x256x3 Image) ---")
+print(f"Dense Layer (1,000 units): {dense_params:,} parameters")
+print(f"Conv2D Layer (32 filters, 3x3): {conv_params:,} parameters")
+print(f"Dense layer has {dense_params / conv_params:.1f}x more parameters!")
+```
 
 ### Trade-offs
 To process spatial data, we must abandon global connectivity in favor of **local connectivity** and **parameter sharing**:
@@ -82,18 +101,6 @@ where:
 - $b$ is the learnable bias.
 - $Z(i, j)$ is the output coordinate in the resulting **feature map**.
 
-```
-       Input Image (5x5)                   Kernel (3x3)              Feature Map (3x3)
-       [ 1  0  1  0  0 ]                   [ 1  0 -1 ]
-       [ 0  1  1  1  0 ] * Convolution     [ 1  0 -1 ]   =======>    [ -1  1  1 ]
-       [ 0  0  1  0  1 ]                   [ 1  0 -1 ]
-       [ 1  0  0  0  0 ]
-       [ 0  1  1  0  1 ]
-       
-       Calculation for top-left output:
-       (1*1) + (0*0) + (1*-1) + (0*1) + (1*0) + (1*-1) + (0*1) + (0*0) + (1*-1) = 1 - 1 - 1 - 1 = -2
-```
-
 For color images with $C$ channels, the kernel has depth $C$ (shape: $k \times k \times C$). The kernel performs a 3D dot product across all channels, summing the results into a single output feature channel.
 
 To detect multiple features (e.g., edges, textures, colors), a Conv2D layer uses $F$ distinct kernels. The output of the layer is a stack of $F$ feature maps, forming a tensor of shape:
@@ -102,9 +109,52 @@ $$\text{Output Shape} = (H_{\text{out}}, W_{\text{out}}, F)$$
 The parameter count for a Conv2D layer with $F$ filters of size $k \times k$ receiving $C$ input channels is:
 $$\text{Parameters} = F \times \left( k \times k \times C + 1 \right)$$
 
-For example, a Conv2D layer with 64 filters of size $3\times3$ receiving an RGB input ($C=3$) has:
-$$\text{Params} = 64 \times (3 \times 3 \times 3 + 1) = 64 \times 28 = 1,792 \text{ parameters}$$
-This parameter count is tiny compared to a dense layer, preventing overfitting and enabling fast training.
+### Python Code Implementation
+Here is a Python function implementing a 2D convolution operation from scratch using NumPy to show how spatial kernels extract features from an image:
+
+```python
+import numpy as np
+
+def convolve2d(image, kernel, bias=0.0):
+    img_h, img_w = image.shape
+    k_h, k_w = kernel.shape
+    
+    # Output dimensions with Valid padding (P=0) and Stride=1
+    out_h = img_h - k_h + 1
+    out_w = img_w - k_w + 1
+    output = np.zeros((out_h, out_w))
+    
+    # Perform the sliding window operation
+    for i in range(out_h):
+        for j in range(out_w):
+            # Extract the current image patch of shape matching the kernel
+            image_patch = image[i:i+k_h, j:j+k_w]
+            # Element-wise multiply and sum
+            output[i, j] = np.sum(image_patch * kernel) + bias
+            
+    return output
+
+# Synthetic 5x5 image containing a vertical boundary line (intensity change)
+image = np.array([
+    [10, 10, 0, 0, 0],
+    [10, 10, 0, 0, 0],
+    [10, 10, 0, 0, 0],
+    [10, 10, 0, 0, 0],
+    [10, 10, 0, 0, 0]
+])
+
+# Sobel-like 3x3 kernel designed to detect vertical edge changes
+vertical_edge_kernel = np.array([
+    [1, 0, -1],
+    [2, 0, -2],
+    [1, 0, -1]
+])
+
+feature_map = convolve2d(image, vertical_edge_kernel)
+print("Input Image:\n", image)
+print("\nVertical Edge Kernel:\n", vertical_edge_kernel)
+print("\nOutput Feature Map:\n", feature_map)
+```
 
 ### Trade-offs
 - **Advantages:** Conv2D layers enforce **local connectivity** (each output unit only depends on a local input region) and **parameter sharing** (the same kernel weights are used at all locations). This makes the feature extractor translation-invariant.
@@ -132,7 +182,7 @@ This parameter count is tiny compared to a dense layer, preventing overfitting a
 ## Topic 3: Stride & Padding: Controlling Feature Map Dimensions
 
 ### Rationale and Mechanics
-As a kernel slides across an input image, the spatial dimensions of the output feature map shrink. If we process a $5\times5$ image with a $3\times3$ kernel, the kernel can only fit in 3 horizontal and 3 vertical positions, yielding a $3\times3$ output. 
+As a kernel slides across an input image, the spatial dimensions of the output feature map shrink. If we process a $5\times5$ image with a $3\times3$ kernel, the kernel can only fit in 3 horizontal and 3 vertical positions, yielding a $3\times3$ output.
 
 If we build a deep network with many layers, the spatial size will shrink to $0$ after a few layers. To prevent this shrinkage and control the output size, we use **Padding** and **Stride**.
 
@@ -145,16 +195,39 @@ $$W_{\text{out}} = \left\lfloor \frac{W_{\text{in}} - k + 2P}{S} \right\rfloor +
     $$P = \frac{k - 1}{2}$$
 - **Stride ($S$):** The step size of the kernel as it slides. A stride of $S=1$ moves the kernel 1 pixel at a time. A stride of $S=2$ moves the kernel 2 pixels at a time, downsampling the spatial dimensions by approximately half.
 
-```
-       Valid Padding (P=0): Shrinks Output     Same Padding (P=1): Preserves Size
-       
-            [x x x x x]                             [0 0 0 0 0 0 0]
-            [x x x x x]                             [0 x x x x x 0]
-            [x x x x x]                             [0 x x x x x 0]
-            [x x x x x]                             [0 x x x x x 0]
-            [x x x x x]                             [0 x x x x x 0]
-                                                    [0 x x x x x 0]
-                                                    [0 0 0 0 0 0 0]
+### Python Code Implementation
+Here is a Python script using Keras layers to construct Conv2D blocks with different padding and stride combinations, validating the output shape calculations:
+
+```python
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+def print_conv_output_shape(input_shape, filters, kernel_size, stride, padding):
+    # Construct a temporary Sequential model containing a single Conv2D layer
+    model = keras.Sequential([
+        layers.Input(shape=input_shape),
+        layers.Conv2D(filters=filters, kernel_size=kernel_size, strides=stride, padding=padding)
+    ])
+    
+    # Retrieve the shape of the output tensor: (Batch, H_out, W_out, Filters)
+    output_shape = model.layers[0].output_shape
+    print(f"Input: {input_shape} | Kernel: {kernel_size} | Stride: {stride} | Padding: '{padding:5s}' -> Output Shape: {output_shape[1:]}")
+
+input_shape = (128, 128, 3)
+
+print("--- Verifying Output Shapes ---")
+# 1. Valid padding, Stride 1 (Shrinks)
+print_conv_output_shape(input_shape, filters=64, kernel_size=(3, 3), stride=1, padding='valid')
+
+# 2. Same padding, Stride 1 (Preserves size)
+print_conv_output_shape(input_shape, filters=64, kernel_size=(3, 3), stride=1, padding='same')
+
+# 3. Valid padding, Stride 2 (Downsamples)
+print_conv_output_shape(input_shape, filters=64, kernel_size=(3, 3), stride=2, padding='valid')
+
+# 4. Same padding, Stride 2 (Downsamples and rounds)
+print_conv_output_shape(input_shape, filters=64, kernel_size=(3, 3), stride=2, padding='same')
 ```
 
 ### Trade-offs

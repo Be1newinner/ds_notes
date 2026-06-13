@@ -21,6 +21,39 @@ $$\frac{\partial \mathcal{L}_{\text{MSE}}}{\partial \hat{y}_i} = -\frac{2}{N} (y
 
 Geometrically, the MSE loss landscape for a linear model is a parabolic curve (in 1D) or a quadratic bowl (in higher dimensions). If the prediction $\hat{y}_i$ is close to the target $y_i$, the error is small and the gradient is close to zero. As the prediction moves away from the target, the loss grows quadratically, and the gradient increases linearly. This linear growth in gradient magnitude ensures that the model receives a strong signal to correct large errors.
 
+### Python Code Implementation
+Here is a complete Python implementation calculating MSE and its gradient, showing how the gradient magnitude scales with the size of the error:
+
+```python
+import numpy as np
+
+def mean_squared_error(y_true, y_pred):
+    return np.mean((y_true - y_pred) ** 2)
+
+def mse_gradient(y_true, y_pred):
+    # Derivative with respect to y_pred
+    return -2.0 / len(y_true) * (y_true - y_pred)
+
+# Scenario: Compare a small error vs. a large error
+y_true = np.array([10.0, 10.0])
+y_pred_close = np.array([9.5, 10.2])  # Small errors
+y_pred_far = np.array([5.0, 15.0])    # Large errors
+
+loss_close = mean_squared_error(y_true, y_pred_close)
+loss_far = mean_squared_error(y_true, y_pred_far)
+
+grad_close = mse_gradient(y_true, y_pred_close)
+grad_far = mse_gradient(y_true, y_pred_far)
+
+print("--- Close Predictions ---")
+print("Loss:", round(loss_close, 4))
+print("Gradient w.r.t predictions:", np.round(grad_close, 4))
+
+print("\n--- Far Predictions ---")
+print("Loss:", round(loss_far, 4))
+print("Gradient w.r.t predictions:", np.round(grad_far, 4))
+```
+
 ### Trade-offs
 MSE is smooth, continuous, and differentiable everywhere, which makes it well-suited for gradient-based optimization. 
 
@@ -33,7 +66,7 @@ This quadratic penalty makes MSE highly sensitive to outliers. If your dataset c
 ### Real-World Applications (Rule of 4)
 
 1. **Example 1: House Price Estimation**
-   - **Input/Scenario:** A regression network predicts the price of a house. The actual price of the house is $y = 300,000$ USD (represented as $3.0$ in hundreds of thousands). The model predicts $\hat{y} = 2.5$.
+   - **Input/Scenario:** A regression network predicts the price of a house. The actual price of the house is $y = 3.0$ (representing 300,000 USD). The model predicts $\hat{y} = 2.5$.
    - **Expected Output:** The squared error contribution is $(3.0 - 2.5)^2 = 0.25$. The gradient contribution is $-\frac{2}{N}(3.0 - 2.5) = -\frac{1}{N}$. This negative gradient pushes the model to increase its predictions for similar houses.
 2. **Example 2: Outlier Sensitivity Comparison**
    - **Input/Scenario:** A model trained on a batch of 2 samples makes predictions. Sample A has an error of $1.0$, while Sample B (an outlier) has an error of $10.0$.
@@ -68,6 +101,53 @@ $$\frac{\partial \mathcal{L}_{\text{CCE}}}{\partial z_c} = \hat{y}_c - y_c$$
 This derivative is incredibly clean and intuitive: it is simply the difference between the predicted probability and the true target value ($predicted - target$).
 - If the model predicts a probability of $0.9$ for the correct class ($y_k = 1$), the gradient is $0.9 - 1.0 = -0.1$, resulting in a small update.
 - If the model predicts a probability of $0.05$ for the correct class, the gradient is $0.05 - 1.0 = -0.95$, triggering a large update to correct the error.
+
+### Python Code Implementation
+Here is a Python implementation of Softmax and Categorical Cross-Entropy, showing how they combine to compute loss and gradients:
+
+```python
+import numpy as np
+
+def softmax(z):
+    # Subtracting max for numerical stability (preventing overflow)
+    shift_z = z - np.max(z)
+    exps = np.exp(shift_z)
+    return exps / np.sum(exps)
+
+def categorical_cross_entropy(y_true, y_pred_probs):
+    # Clip predictions to prevent log(0) which leads to NaN
+    y_pred_probs = np.clip(y_pred_probs, 1e-15, 1.0 - 1e-15)
+    return -np.sum(y_true * np.log(y_pred_probs))
+
+def cce_gradient_wrt_logits(y_true, y_pred_probs):
+    # The gradient of CCE with respect to the pre-softmax logits is simply (pred - true)
+    return y_pred_probs - y_true
+
+# Scenario: 3 classes (Cat, Dog, Bird). True class is Cat (index 0)
+y_true = np.array([1.0, 0.0, 0.0])
+
+# Case A: Correct prediction with high confidence
+logits_confident = np.array([3.0, -1.0, -2.0])
+probs_confident = softmax(logits_confident)
+loss_confident = categorical_cross_entropy(y_true, probs_confident)
+grad_confident = cce_gradient_wrt_logits(y_true, probs_confident)
+
+# Case B: Incorrect prediction with high confidence
+logits_incorrect = np.array([-2.0, 4.0, -2.0])
+probs_incorrect = softmax(logits_incorrect)
+loss_incorrect = categorical_cross_entropy(y_true, probs_incorrect)
+grad_incorrect = cce_gradient_wrt_logits(y_true, probs_incorrect)
+
+print("--- Confident Correct ---")
+print("Probabilities:", np.round(probs_confident, 4))
+print("Loss:         ", round(loss_confident, 4))
+print("Logit Grads:  ", np.round(grad_confident, 4))
+
+print("\n--- Confident Incorrect ---")
+print("Probabilities:", np.round(probs_incorrect, 4))
+print("Loss:         ", round(loss_incorrect, 4))
+print("Logit Grads:  ", np.round(grad_incorrect, 4))
+```
 
 ### Trade-offs
 The combination of Softmax and Categorical Cross-Entropy is highly effective because the derivative of the combined loss function cancels out the exponential term of the Softmax. This prevents gradient saturation: even when the model makes a highly incorrect prediction, the gradient remains large, ensuring fast convergence.
@@ -113,20 +193,48 @@ At any point where the gradient is zero ($\nabla L = 0$), we can determine the l
 
 In high-dimensional spaces (where models can have millions of parameters), the probability of finding a true local minimum where all eigenvalues are positive is extremely low (approximately $2^{-D}$, where $D$ is the parameter count). Instead, almost all critical points where the gradient is zero are **saddle points**.
 
-```
-                   Saddle Point Geometry
-                   
-                         Loss (L)
-                            ^       / (Loss increases)
-                            |     /
-                            |   /
-              <-------------+-------------> Parameter 1
-              (Loss decreases)
-                            |
-                            |
-```
-
 In these high-dimensional landscapes, optimizers can get stuck on **flat plateaus** (where gradients are near zero) or slow down near saddle points, where the gradient along the escape path is very small.
+
+### Python Code Implementation
+Here is a Python demonstration showing how to compute the Hessian matrix at a critical point of a 2D function and check its eigenvalues to classify the point as a saddle point:
+
+```python
+import numpy as np
+
+# A simple non-convex function: f(w1, w2) = w1^2 - w2^2 (saddle point at (0, 0))
+def loss_function(w):
+    return w[0]**2 - w[1]**2
+
+def compute_gradient(w):
+    return np.array([2.0 * w[0], -2.0 * w[1]])
+
+def compute_hessian(w):
+    # Hessian matrix is [[d^2f/dw1^2, d^2f/dw1dw2], [d^2f/dw2dw1, d^2f/dw2^2]]
+    # Here, d^2f/dw1^2 = 2, d^2f/dw2^2 = -2, cross derivatives are 0
+    return np.array([[2.0, 0.0], [0.0, -2.0]])
+
+# Test at the origin (0, 0)
+w_point = np.array([0.0, 0.0])
+gradient = compute_gradient(w_point)
+hessian = compute_hessian(w_point)
+eigenvalues = np.linalg.eigvals(hessian)
+
+print("Point:", w_point)
+print("Gradient Vector:", gradient)
+print("Hessian Matrix:\n", hessian)
+print("Eigenvalues of Hessian:", eigenvalues)
+
+# Check classification
+if np.all(gradient == 0):
+    if np.all(eigenvalues > 0):
+        print("Classification: Local Minimum")
+    elif np.all(eigenvalues < 0):
+        print("Classification: Local Maximum")
+    elif np.any(eigenvalues > 0) and np.any(eigenvalues < 0):
+        print("Classification: Saddle Point")
+    else:
+        print("Classification: Flat/Undetermined")
+```
 
 ### Trade-offs
 Understanding the geometry of the loss landscape explains why standard optimization algorithms fail or succeed. 

@@ -42,12 +42,45 @@ $$\delta_k^{(l-1)} = \left( \sum_j \delta_j^{(l)} w_{j,k}^{(l)} \right) \cdot g'
 
 This recursive relationship is the core of backpropagation. We start at the output layer $L$, calculate $\delta^{(L)}$, and then use the weight matrices to project these deltas backward, layer-by-layer, calculating all derivatives in a single backward pass. This pass scales linearly with the number of weights, $O(M)$, making training deep networks feasible.
 
-```
-       Forward Pass:  x ---> [Layer 1] ---> [Layer 2] ---> y_hat ---> Loss
-       
-       Backward Pass: dx <--- [Layer 1] <--- [Layer 2] <--- dy_hat <--- Loss
-                                 |              |
-                              dw1, db1       dw2, db2
+### Python Code Implementation
+Here is a complete Python implementation showing forward and backward passes for a single neuron connection using NumPy:
+
+```python
+import numpy as np
+
+def relu(z):
+    return np.maximum(0, z)
+
+def relu_derivative(z):
+    return np.where(z > 0, 1.0, 0.0)
+
+# Forward pass for a single neuron: z = w*x + b, a = relu(z)
+def forward_neuron(x, w, b):
+    z = w * x + b
+    a = relu(z)
+    return z, a
+
+# Backward pass to calculate gradients: L = 0.5 * (a - y_true)^2
+def backward_neuron(x, w, b, z, a, y_true):
+    # dL/da: Derivative of loss w.r.t activation
+    dL_da = a - y_true
+    # da/dz: Derivative of activation w.r.t pre-activation
+    da_dz = relu_derivative(z)
+    # Error delta: dL/dz = dL/da * da/dz
+    delta = dL_da * da_dz
+    # dL/dw = delta * x
+    dL_dw = delta * x
+    # dL/db = delta * 1.0
+    dL_db = delta * 1.0
+    return dL_dw, dL_db
+
+# Run a sample step
+x, w, b, y_true = 2.0, 0.5, 1.0, 3.0
+z, a = forward_neuron(x, w, b)
+dw, db = backward_neuron(x, w, b, z, a, y_true)
+
+print("Forward Pass -> z:", z, "a (prediction):", a)
+print("Backward Pass -> dw (weight gradient):", dw, "db (bias gradient):", db)
 ```
 
 ### Trade-offs
@@ -91,16 +124,32 @@ $$\mathbf{v}_t = \beta \mathbf{v}_{t-1} + (1 - \beta) \nabla_\theta L(\theta_t)$
 $$\theta_{t+1} = \theta_t - \eta \mathbf{v}_t$$
 where $\beta \in [0, 1)$ is the momentum decay factor (typically set to $0.9$).
 
-```
-       SGD:          Oscillates wildly in narrow valleys
-                     \   /\   /\   /
-                      \/  \/  \/  / ---> Optimal
-                      
-       Momentum:     Dampens oscillations and speeds straight down
-                     ------------------------------> Optimal
-```
-
 When gradients point in consistent directions, the velocity vector grows, accelerating training. When gradients oscillate back and forth (e.g., across the walls of a narrow valley), the momentum term averages them out, dampening the oscillations and focusing the updates down the center of the valley.
+
+### Python Code Implementation
+Here is a Python function implementing SGD with Momentum and demonstrating how it dampens oscillatory updates:
+
+```python
+import numpy as np
+
+def sgd_momentum_update(w, grad, v, lr=0.1, beta=0.9):
+    # Update velocity
+    v_new = beta * v + (1.0 - beta) * grad
+    # Update parameter
+    w_new = w - lr * v_new
+    return w_new, v_new
+
+# Let's simulate optimization steps in an oscillating environment
+w = 1.0
+v = 0.0
+
+# Alternating gradient direction to simulate oscillations across valley walls
+gradients = [10.0, -10.0, 8.0, -8.0]
+
+for i, grad in enumerate(gradients):
+    w, v = sgd_momentum_update(w, grad, v, lr=0.1, beta=0.9)
+    print(f"Step {i+1} -> Gradient: {grad:5.1f} | Velocity: {v:6.3f} | Weight: {w:6.3f}")
+```
 
 ### Trade-offs
 SGD with Momentum is simple, memory-efficient, and often yields excellent generalization. Research shows that SGD can converge to flatter minima than more complex optimizers, resulting in better test accuracy.
@@ -115,7 +164,7 @@ The trade-off is that SGD is highly sensitive to the learning rate $\eta$ and mo
      - Step 1: $v_1 = 0.9(0) + 0.1(-2.0) = -0.2$. Weight update is $- \eta v_1 = +0.02$.
      - Step 2: $v_2 = 0.9(-0.2) + 0.1(-2.0) = -0.38$. Weight update is $- \eta v_2 = +0.038$.
      The velocity accumulates, accelerating the step size along the consistent gradient direction.
-2. **Example 3: Dampening Oscillations in Valleys**
+2. **Example 2: Dampening Oscillations in Valleys**
    - **Input/Scenario:** An optimizer oscillates across a valley. The gradient along the oscillation axis is $+5.0$ at step 1 and $-5.0$ at step 2. Momentum is $\beta = 0.9$ and initial velocity is $v_0 = 0$.
    - **Expected Output:**
      - Step 1: $v_1 = 0.9(0) + 0.1(5.0) = 0.5$.
@@ -155,6 +204,38 @@ $$\hat{\mathbf{s}}_t = \frac{\mathbf{s}_t}{1 - \beta_2^t}$$
 where $t$ is the current training step. The final Adam parameter update is:
 $$\theta_{t+1} = \theta_t - \frac{\eta}{\sqrt{\hat{\mathbf{s}}_t} + \epsilon} \hat{\mathbf{m}}_t$$
 Standard defaults are $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 10^{-8}$.
+
+### Python Code Implementation
+Here is a Python implementation of Adam from scratch, illustrating the tracking and bias correction of the first and second moments:
+
+```python
+import numpy as np
+
+def adam_update(theta, grad, m, s, t, lr=0.001, beta1=0.9, beta2=0.999, eps=1e-8):
+    # Update first moment (momentum)
+    m_new = beta1 * m + (1.0 - beta1) * grad
+    # Update second moment (RMSprop)
+    s_new = beta2 * s + (1.0 - beta2) * (grad ** 2)
+    
+    # Bias correction (scales up early iterations)
+    m_hat = m_new / (1.0 - beta1 ** t)
+    s_hat = s_new / (1.0 - beta2 ** t)
+    
+    # Parameter update step
+    theta_new = theta - lr * m_hat / (np.sqrt(s_hat) + eps)
+    
+    return theta_new, m_new, s_new
+
+# Simulating three steps of Adam optimization
+theta = 5.0
+m = 0.0
+s = 0.0
+
+for step in range(1, 4):
+    grad = -2.0 * theta  # A simple gradient of loss L = theta^2
+    theta, m, s = adam_update(theta, grad, m, s, t=step)
+    print(f"Step {step} | Grad: {grad:6.2f} | Theta: {theta:6.4f} | m: {m:6.4f} | s: {s:6.4f}")
+```
 
 ### Trade-offs
 Adam is the default optimizer for most deep learning architectures (including Transformers and CNNs) because it is highly robust and requires very little hyperparameter tuning. It handles noisy gradients, sparse data, and non-stationary objectives extremely well.

@@ -29,19 +29,52 @@ Let's analyze the mathematical matrices for the most common augmentations:
   $$\mathbf{A}_{\text{flip}} = \begin{pmatrix} -1 & 0 \\ 0 & 1 \end{pmatrix}, \quad \mathbf{t} = \begin{pmatrix} W \\ 0 \end{pmatrix}$$
   where $W$ is the image width, translating the coordinates back into the positive quadrant.
 
-```
-       Original Coordinate (x, y) --------> [ Affine Transform ] --------> Real-Valued (x', y')
-                                                    |
-                                                    v
-                                        [ Bilinear Interpolation ]
-                                                    |
-                                                    v
-                                        Final Pixel Value at (x', y')
-```
-
 Because the calculated coordinates $x'$ and $y'$ are usually real numbers (floats) rather than integers, they do not align perfectly with the target pixel grid. To determine the pixel intensity at the new coordinate, we use **Bilinear Interpolation**. We calculate a weighted average of the intensities of the four nearest integer coordinates surrounding the target point:
 $$I(x', y') \approx (1-d_x)(1-d_y)I(x_0, y_0) + d_x(1-d_y)I(x_1, y_0) + (1-d_x)d_yI(x_0, y_1) + d_xd_yI(x_1, y_1)$$
 where $d_x$ and $d_y$ are the fractional distances from the top-left integer pixel $(x_0, y_0)$ to the target point $(x', y')$.
+
+### Python Code Implementation
+Here is a Python script illustrating how to define and run a 2D coordinate rotation matrix from scratch, transforming coordinates and demonstrating how bilinear interpolation coefficients are derived:
+
+```python
+import numpy as np
+
+def rotate_coordinate(coord, angle_degrees):
+    # Convert degrees to radians
+    theta = np.radians(angle_degrees)
+    
+    # Define rotation matrix R
+    R = np.array([
+        [np.cos(theta), -np.sin(theta)],
+        [np.sin(theta), np.cos(theta)]
+    ])
+    
+    # Matrix multiplication to find transformed coordinates
+    return np.dot(R, coord)
+
+# Initial coordinate in our image space
+coord = np.array([2.0, 5.0])
+rotated = rotate_coordinate(coord, angle_degrees=30.0)
+
+print(f"Original Coordinate: {coord}")
+print(f"Rotated (30 deg):     {np.round(rotated, 4)}")
+
+# Calculate bilinear interpolation weights for the new coordinate
+x_float, y_float = rotated[0], rotated[1]
+x0, y0 = int(np.floor(x_float)), int(np.floor(y_float))
+x1, y1 = x0 + 1, y0 + 1
+
+dx = x_float - x0
+dy = y_float - y0
+
+print(f"\nNearest grid coordinates: ({x0}, {y0}) to ({x1}, {y1})")
+print(f"Fractional distances (dx, dy): {dx:.4f}, {dy:.4f}")
+print(f"Interpolation weights:")
+print(f"  Top-Left weight:  {(1-dx)*(1-dy):.4f}")
+print(f"  Top-Right weight: {dx*(1-dy):.4f}")
+print(f"  Bottom-Left weight: {(1-dx)*dy:.4f}")
+print(f"  Bottom-Right weight: {dx*dy:.4f}")
+```
 
 ### Trade-offs
 Affine transformations are highly effective at introducing variation.
@@ -83,12 +116,37 @@ Under the hood:
 - **Offline Augmentation:** We apply transformations to the training images beforehand and save the augmented images to disk. For a dataset of size $N$, if we generate 5 augmentations per image, the dataset size increases to $5N$. During training, the optimizer reads these static files from disk.
 - **Online Augmentation:** We do not save augmented images to disk. Instead, when loading a batch of size $B$ during training, we apply random transformations to the images on the fly in system memory. In each epoch, the model receives a slightly different set of random transformations, meaning it never sees the exact same image twice.
 
-```
-       Offline Augmentation:
-       [ Raw Dataset ] ---> [ Augment & Save ] ---> [ Disk (5x size) ] ---> Train
-       
-       Online Augmentation:
-       [ Raw Dataset ] ---> Train ---> [ Random Transform on-the-fly ] ---> GPU
+### Python Code Implementation
+Here is a Python simulation comparing the unique training samples generated using static offline augmentation (limited set of pre-rendered options) versus online augmentation (infinite variations on the fly):
+
+```python
+import numpy as np
+
+# Simulate a training dataset of 3 images
+raw_images = [np.array([1.0]), np.array([2.0]), np.array([3.0])]
+
+# 1. Offline Simulation: Generate 3 static variations per image beforehand
+offline_database = []
+for img in raw_images:
+    offline_database.append(img)  # original
+    offline_database.append(img + 0.1)  # variation 1
+    offline_database.append(img + 0.2)  # variation 2
+
+print(f"Offline Database Size: {len(offline_database)} samples")
+print("Offline Samples:       ", [x[0] for x in offline_database])
+
+# 2. Online Simulation: Apply random continuous variations on the fly during training
+def online_augment(img):
+    # Apply a continuous random shift
+    noise = np.random.uniform(0.0, 0.5)
+    return img + noise
+
+print("\n--- Training Simulation (3 Epochs) ---")
+for epoch in range(1, 4):
+    print(f"Epoch {epoch}:")
+    # Generate batch values dynamically
+    epoch_batch = [round(online_augment(img)[0], 4) for img in raw_images]
+    print(f"  Online Batch Values: {epoch_batch}")
 ```
 
 ### Trade-offs
@@ -151,6 +209,49 @@ model = keras.Sequential([
 Because these layers are built into the Keras model graph:
 - **During Training (`training=True`):** The layers generate random parameters (e.g., drawing a random angle between $-0.2\times2\pi$ and $+0.2\times2\pi$ rad) and apply the transformation to the batch.
 - **During Testing/Inference (`training=False`):** The layers are automatically bypassed. They act as identity mappings, passing the clean input images directly to the convolutional layers. This ensures predictions are made on unaltered data.
+
+### Python Code Implementation
+Here is a Python script showing how to build a preprocessing and augmentation pipeline using Keras layers, and confirming how they dynamically alter data during training but remain inactive during inference:
+
+```python
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+import numpy as np
+
+# Define in-graph augmentation layers
+augment_pipeline = keras.Sequential([
+    layers.RandomFlip("horizontal"),
+    layers.RandomZoom(0.1)
+])
+
+# Create a dummy image of shape (1, 4, 4, 1) - single channel 4x4
+dummy_image = np.array([[[[1], [2], [3], [4]],
+                         [[5], [6], [7], [8]],
+                         [[9], [10], [11], [12]],
+                         [[13], [14], [15], [16]]]]).astype(float)
+
+print("Original Image Matrix (spatial view):\n", dummy_image[0, :, :, 0])
+
+# 1. Simulate training forward pass (applying transformations)
+# We set training=True explicitly
+training_outputs = [augment_pipeline(dummy_image, training=True)[0, :, :, 0].numpy() for _ in range(3)]
+
+print("\n--- Training Passes (Dynamic Outputs) ---")
+for i, out in enumerate(training_outputs):
+    print(f"Pass {i+1} Output:\n", out)
+
+# 2. Simulate evaluation/testing pass (bypass transformations)
+# We set training=False explicitly
+testing_output = augment_pipeline(dummy_image, training=False)[0, :, :, 0].numpy()
+
+print("\n--- Testing Pass (Identity Output) ---")
+print("Test Output:\n", testing_output)
+
+# Check if identical to input
+assert np.all(testing_output == dummy_image[0, :, :, 0]), "Transformation applied in testing!"
+print("\nValidation Succeeded: Augmentations were successfully bypassed in testing.")
+```
 
 ### Trade-offs
 - **Advantages:** The entire preprocessing and augmentation logic is compiled into the model. When we export the model (`model.save('my_model')`), the augmentation layers are saved inside the file. When we load the model in a production environment (e.g., using TensorFlow Serving), it automatically handles input preprocessing, eliminating the need to write matching preprocessing code in the production client.

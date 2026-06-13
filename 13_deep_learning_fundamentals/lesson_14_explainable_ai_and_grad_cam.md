@@ -17,14 +17,38 @@ In classical machine learning, model interpretability is a built-in feature. For
 
 In deep neural networks, this direct interpretability is lost. A convolutional neural network processes pixels through layers of convolutions, activations, and pooling. By the time the image reaches the final layer, the spatial pixel coordinates are blended into abstract feature vectors.
 
-```
-       Image ---> [ Conv + Pool Layers ] ---> [ Dense Layer ] ---> Prediction
-                     |                            |
-               Spatial Pixels                Black Box
-             (Direct Meaning)            (Abstract Vectors)
-```
-
 Explainable AI (XAI) for computer vision attempts to solve this by generating **visual attribution maps**. These are heatmaps overlaid on the input image, where color intensity represents the importance of each pixel to the model's final prediction.
+
+### Python Code Implementation
+Here is a Python script demonstrating how a Dense layer scrambles spatial pixel relationships during flattening, showing why we need post-hoc explainability methods to map abstract features back to the original image space:
+
+```python
+import numpy as np
+
+# Simulate a simple 4x4 image
+img = np.array([
+    [0.1, 0.2, 0.3, 0.4],
+    [0.5, 0.6, 0.7, 0.8],
+    [0.9, 1.0, 1.1, 1.2],
+    [1.3, 1.4, 1.5, 1.6]
+])
+
+# Flatten the image into a 1D vector (simulating input to a dense layer)
+flattened = img.flatten()
+
+# Simulate a hidden dense neuron weight matrix of shape (16, 4)
+np.random.seed(42)
+weights = np.random.randn(16, 4)
+
+# Calculate activations
+activations = np.dot(flattened, weights)
+
+print("Original 4x4 Image:\n", img)
+print("\nFlattened Vector (length 16):\n", flattened)
+print("\nDense Layer Activations (4 units):\n", np.round(activations, 4))
+print("\nNote: Without an attribution mapping, looking at the activations tells us")
+print("nothing about which of the original 16 pixel coordinates contributed most.")
+```
 
 ### Trade-offs
 The primary trade-off in XAI is the balance between **interpretability** and **accuracy**:
@@ -69,15 +93,54 @@ Under the hood, the Grad-CAM algorithm calculates the heatmap using the followin
 5. **Weighted Combination & ReLU:** We perform a weighted sum of the feature maps $A^k$ using the weights $\alpha_k^c$, and apply a Rectified Linear Unit (ReLU) to the result:
    $$L_{\text{Grad-CAM}}^c = \text{ReLU}\left( \sum_k \alpha_k^c A^k \right)$$
 
-```
-        Feature Maps A^k                   Channel Weights alpha_k^c
-        [  H x W Map 1  ] ---------------> Multiplied by alpha_1
-        [  H x W Map 2  ] ---------------> Multiplied by alpha_2   ===> Sum maps ===> Apply ReLU ===> Heatmap
-        [      ...      ]
-        [  H x W Map K  ] ---------------> Multiplied by alpha_K
-```
-
 We apply the ReLU function because we are only interested in features that *positively* contribute to the target class $c$. Pixels that decrease the class score (negative values) are filtered out, leaving only the regions that support the prediction.
+
+### Python Code Implementation
+Here is a complete, standard TensorFlow/Keras implementation of the helper function to calculate the Grad-CAM heatmap for an input image:
+
+```python
+import tensorflow as tf
+from tensorflow import keras
+import numpy as np
+
+def make_gradcam_heatmap(img_array, model, last_conv_layer_name, pred_index=None):
+    # 1. Create a model that outputs the last conv layer activations and output predictions
+    grad_model = keras.models.Model(
+        inputs=[model.inputs],
+        outputs=[model.get_layer(last_conv_layer_name).output, model.output]
+    )
+
+    # 2. Record the gradients of the class score w.r.t the last conv layer output
+    with tf.GradientTape() as tape:
+        last_conv_layer_output, preds = grad_model(img_array)
+        if pred_index is None:
+            pred_index = tf.argmax(preds[0])
+        class_channel = preds[:, pred_index]
+
+    # 3. Calculate gradients of the class channel w.r.t final conv activations
+    grads = tape.gradient(class_channel, last_conv_layer_output)
+
+    # 4. Global average pool the gradients (calculate channel weights)
+    pooled_grads = tf.reduce_mean(grads, axis=(0, 1, 2))
+
+    # 5. Multiply each channel map by its corresponding weight and sum
+    last_conv_layer_output = last_conv_layer_output[0]
+    heatmap = last_conv_layer_output @ pooled_grads[..., tf.newaxis]
+    heatmap = tf.squeeze(heatmap)
+
+    # 6. Apply ReLU and normalize between 0 and 1
+    heatmap = tf.maximum(heatmap, 0.0)
+    max_val = tf.math.reduce_max(heatmap)
+    if max_val == 0.0:
+        max_val = 1e-15  # Prevent division by zero
+    heatmap = heatmap / max_val
+    
+    return heatmap.numpy()
+
+# Note: To test this, you would pass a compiled Keras model, a preprocessed
+# image array, and the string name of the target final convolutional layer.
+print("Grad-CAM function compiled successfully.")
+```
 
 ### Trade-offs
 Grad-CAM can be applied to any CNN architecture without retraining or changing the network topology, and it is computationally cheap because it only requires one forward and one backward pass.
@@ -115,14 +178,35 @@ where $\alpha \approx 0.4$ controls the blending transparency.
 
 This visualization is a powerful debugging tool. It helps identify **"Clever Hans"** models—networks that achieve high accuracy on validation sets by exploiting spurious background shortcuts rather than learning the actual visual concept.
 
-```
-       Original Image              Saturated Overlay (Cheat)          Correct Overlay
-       
-        [ Husky on Snow ]           [ Husky on SNOW ]                  [ HUSKY on Snow ]
-                                       ^ (Red Heatmap on snow)            ^ (Red Heatmap on face)
-```
-
 For example, if a model trained to classify wolves vs. huskies always sees wolves in snowy backgrounds and huskies in grass, it will learn to classify based on the background. Grad-CAM reveals this immediately by showing a red heatmap over the snow rather than the animal's face.
+
+### Python Code Implementation
+Here is a Python script using NumPy to simulate the upsampling and blending equations of Grad-CAM visualization, printing out the final blended values:
+
+```python
+import numpy as np
+
+# Simulate a coarse 4x4 normalized heatmap
+coarse_heatmap = np.array([
+    [0.0, 0.1, 0.1, 0.0],
+    [0.1, 0.9, 0.8, 0.1],
+    [0.0, 0.8, 0.9, 0.0],
+    [0.0, 0.0, 0.0, 0.0]
+])
+
+# Simulate upsampling the 4x4 heatmap to an 8x8 input image using kronecker product (nearest neighbor analogy)
+upsampled_heatmap = np.kron(coarse_heatmap, np.ones((2, 2)))
+
+# Simulate an 8x8 input image (grayscale channel for simplicity)
+original_image = np.ones((8, 8)) * 0.5  # Neutral grey
+
+# Blending equation: Overlay = alpha * Heatmap + (1 - alpha) * Original
+alpha = 0.4
+overlay = alpha * upsampled_heatmap + (1.0 - alpha) * original_image
+
+print("Upsampled 8x8 Heatmap (importance scores):\n", np.round(upsampled_heatmap, 2))
+print("\nBlended Overlay Output (pixel values):\n", np.round(overlay, 2))
+```
 
 ### Trade-offs
 Visualizing heatmaps is critical for auditing models before production deployment. It builds trust with stakeholders and identifies failure modes that standard validation metrics (like accuracy) miss.

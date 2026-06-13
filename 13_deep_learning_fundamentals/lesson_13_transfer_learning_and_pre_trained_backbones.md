@@ -24,18 +24,32 @@ $$\mathcal{T} = \{\mathcal{Y}, f(\cdot)\} = \{\mathcal{Y}, P(Y|X)\}$$
 In transfer learning, we have a **Source Domain** $\mathcal{D}_s$ and a **Source Task** $\mathcal{T}_s$ (e.g., classifying 1.4 million images into 1,000 classes on ImageNet), and a **Target Domain** $\mathcal{D}_t$ and a **Target Task** $\mathcal{T}_t$ (e.g., classifying 500 medical images into "benign" or "malignant"). The goal is to learn the target predictive function $f_t(\cdot)$ using the knowledge already learned in $\mathcal{D}_s$ and $\mathcal{T}_s$, where:
 $$\mathcal{D}_s \neq \mathcal{D}_t \quad \text{or} \quad \mathcal{T}_s \neq \mathcal{T}_t$$
 
-```
-       Source Task (ImageNet)                      Target Task (Medical Scan Classifier)
-       [ 1.4M general images ]                     [ 500 medical scans ]
-                 |                                           |
-                 v                                           v
-       Train Deep ResNet50                         Import Pre-trained ResNet50
-       (Learns edge, shape filters)                (Keep filters, replace output head)
-                 |                                           |
-                 \------------------------------------------>/ (Transfer weights)
-```
-
 Reusing the pre-trained weights provides a powerful **Inductive Bias**. Instead of initializing the weights randomly (which starts optimization at a random point in the loss landscape), we start the optimization process close to a high-quality local minimum. The network does not need to learn how to detect edges, contrast, or textures from scratch—it already knows how to extract these features, and only needs to learn how to combine them for the new task.
+
+### Python Code Implementation
+Here is a Python script that loads a pre-trained backbone using Keras applications, demonstrating how to inspect the layers and understand the parameter distribution of the base vs. the top classification layer:
+
+```python
+import tensorflow as tf
+from tensorflow import keras
+
+# Load MobileNetV2 with its default top classification layer (trained on ImageNet)
+full_model = keras.applications.MobileNetV2(
+    weights='imagenet',
+    include_top=True
+)
+
+# Load MobileNetV2 without the top classification layer (convolutional base only)
+base_model = keras.applications.MobileNetV2(
+    weights='imagenet',
+    include_top=False
+)
+
+print(f"--- MobileNetV2 Architecture Analysis ---")
+print(f"Full ImageNet Model Parameter Count : {full_model.count_params():,}")
+print(f"Convolutional Base Parameter Count  : {base_model.count_params():,}")
+print(f"Classification Head Parameter Count : {full_model.count_params() - base_model.count_params():,}")
+```
 
 ### Trade-offs
 - **Advantages:** Reduces the required size of the target dataset by $99\%$. It saves massive amounts of compute time, electricity, and cloud training costs.
@@ -98,14 +112,43 @@ During model compilation and fitting, the optimizer calculates the parameter cou
 - **Trainable Parameters:** Only the weights and biases of the custom Dense layers are updated.
 - **Non-Trainable Parameters:** The weights of the ResNet50 backbone. Their gradients are not calculated, and their values remain frozen.
 
-```
-       Input ---> [ Pre-trained ResNet50 Base ] ---> [ Global Avg Pool ] ---> [ Custom Dense Head ]
-                           |                                                        |
-                     Frozen Weights                                          Trainable Weights
-                     (No Updates)                                             (Optimized)
-```
-
 The frozen backbone acts as a static feature extraction pipeline, converting raw pixels into a high-level feature vector that the custom head learns to classify.
+
+### Python Code Implementation
+Here is a Python script demonstrating how to import a pre-trained MobileNetV2 base, freeze its weights, and attach a custom dense classifier, verifying that the parameters are categorized correctly as trainable vs. non-trainable:
+
+```python
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# 1. Load the pre-trained base
+base_model = keras.applications.MobileNetV2(
+    input_shape=(224, 224, 3),
+    include_top=False,
+    weights='imagenet'
+)
+
+# 2. Freeze the base model weights
+base_model.trainable = False
+
+# 3. Construct the Sequential model
+model = keras.Sequential([
+    base_model,
+    layers.GlobalAveragePooling2D(),
+    layers.Dense(128, activation='relu'),
+    layers.Dense(1, activation='sigmoid')  # Binary classification
+])
+
+# 4. Verify parameter status
+model.summary()
+
+# Confirm that the backbone layers are frozen
+print("\n--- Trainable Status of layers ---")
+print("Base Model Trainable:", base_model.trainable)
+print(f"Total Trainable weights groups: {len(model.trainable_weights)}")
+print(f"Total Non-trainable weights groups: {len(model.non_trainable_weights)}")
+```
 
 ### Trade-offs
 Freezing the backbone is safe, fast, and computationally cheap. Since we do not calculate gradients for the millions of parameters in the backbone, training is extremely fast and requires much less GPU memory.
@@ -157,13 +200,54 @@ We freeze the early layers because they extract low-level, general features (edg
 Crucially, when fine-tuning, we must recompile the model using an **extremely low learning rate**:
 $$\eta_{\text{fine-tune}} \approx 10^{-5}$$
 
-```
-       [ Input ] ---> [ Early Layers: Frozen ] ---> [ Deeper Layers: Unfrozen ] ---> [ Custom Head: Trainable ]
-                                |                                 |                                |
-                        lr = 0 (No updates)                 lr = 1e-5 (Fine-tuned)           lr = 1e-5 (Fine-tuned)
-```
-
 This tiny learning rate ensures that we make small, incremental adjustments to the pre-trained weights, adapting them to the new data without destroying the learned feature structures.
+
+### Python Code Implementation
+Here is a Python script demonstrating the transition from feature extraction to fine-tuning, showing how to selectively unfreeze layers and recompile the model:
+
+```python
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# Setup standard feature extractor first
+base_model = keras.applications.MobileNetV2(
+    input_shape=(224, 224, 3),
+    include_top=False,
+    weights='imagenet'
+)
+base_model.trainable = False
+
+model = keras.Sequential([
+    base_model,
+    layers.GlobalAveragePooling2D(),
+    layers.Dense(1, activation='sigmoid')
+])
+
+# First compilation (feature extraction phase)
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+print("Total trainable weights groups (extraction phase):", len(model.trainable_weights))
+
+# --- Transition to Fine-Tuning Phase ---
+# 1. Unfreeze the base model
+base_model.trainable = True
+
+# 2. Selectively freeze early layers (e.g., freeze all except the last 20 layers)
+fine_tune_at = len(base_model.layers) - 20
+for layer in base_model.layers[:fine_tune_at]:
+    layer.trainable = False
+
+# 3. Recompile the model with a tiny learning rate (1e-5)
+model.compile(
+    optimizer=keras.optimizers.Adam(learning_rate=1e-5),
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+
+# Confirm parameters shifted to trainable categories
+model.summary()
+print("Total trainable weights groups (fine-tuning phase):", len(model.trainable_weights))
+```
 
 ### Trade-offs
 Fine-tuning unlocks the full representation capacity of transfer learning, often boosting target classification accuracy by $3\%$ to $10\%$.

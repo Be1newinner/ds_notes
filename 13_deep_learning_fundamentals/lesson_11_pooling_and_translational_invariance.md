@@ -20,27 +20,52 @@ Under the hood, MaxPooling slides a window of size $p \times p$ (typically $2\ti
 Mathematically, let $X$ be the input feature map. The output feature map $Z$ at coordinate $(i, j)$ is:
 $$Z(i, j) = \max_{m=1}^p \max_{n=1}^p X(i \cdot S + m - 1, j \cdot S + n - 1)$$
 
-```
-       Input Feature Map (4x4)                 MaxPooling (2x2 pool, stride 2)
-       
-       [ 1  3 | 2  9 ]                         
-       [ 8  2 | 1  0 ]      MaxPooling         [ 8  9 ]
-       -------+-------     ===========>        [ 5  6 ]
-       [ 5  4 | 1  6 ]                         
-       [ 0  1 | 2  3 ]
-       
-       Calculation:
-       - Top-left quadrant:  max(1, 3, 8, 2) = 8
-       - Top-right quadrant: max(2, 9, 1, 0) = 9
-       - Bottom-left:        max(5, 4, 0, 1) = 5
-       - Bottom-right:       max(1, 6, 2, 3) = 6
-```
-
-Crucially, MaxPooling has **zero learnable weights or biases**. It is a fixed mathematical operation that requires no parameters. 
+Crucially, MaxPooling has **zero learnable weights or biases**. It is a fixed mathematical operation that requires no parameters.
 
 For a pooling window of size $2\times2$ and stride $S=2$, the spatial height and width of the feature map are cut exactly in half:
 $$H_{\text{out}} = \frac{H_{\text{in}}}{2}, \quad W_{\text{out}} = \frac{W_{\text{in}}}{2}$$
 This reduces the total spatial area (number of pixels) by **$75\%$**, significantly decreasing GPU memory usage and parameter counts for downstream layers.
+
+### Python Code Implementation
+Here is a Python function implementing a 2D MaxPooling operation from scratch using NumPy, verifying the downsampling calculations:
+
+```python
+import numpy as np
+
+def maxpool2d(feature_map, pool_size=2, stride=2):
+    h_in, w_in = feature_map.shape
+    
+    # Calculate output dimensions
+    h_out = (h_in - pool_size) // stride + 1
+    w_out = (w_in - pool_size) // stride + 1
+    output = np.zeros((h_out, w_out))
+    
+    # Slide the pooling window
+    for i in range(h_out):
+        for j in range(w_out):
+            h_start = i * stride
+            h_end = h_start + pool_size
+            w_start = j * stride
+            w_end = w_start + pool_size
+            
+            # Extract local patch and select maximum value
+            patch = feature_map[h_start:h_end, w_start:w_end]
+            output[i, j] = np.max(patch)
+            
+    return output
+
+# Synthetic 4x4 feature map
+fm = np.array([
+    [1.0, 3.0, 2.0, 9.0],
+    [8.0, 2.0, 1.0, 0.0],
+    [5.0, 4.0, 1.0, 6.0],
+    [0.0, 1.0, 2.0, 3.0]
+])
+
+pooled_fm = maxpool2d(fm, pool_size=2, stride=2)
+print("Input Feature Map (4x4):\n", fm)
+print("\nMaxPooling Output (2x2, stride=2):\n", pooled_fm)
+```
 
 ### Trade-offs
 - **Advantages:** MaxPooling selects the most active feature in a local region. If a kernel detects a horizontal edge at coordinate $(i, j)$ and outputs a high activation value, MaxPooling preserves this high value even if the edge shifts slightly within the pooling window.
@@ -83,21 +108,81 @@ To achieve this, CNNs combine two different properties:
 
 Under the hood, let $T_s(\mathbf{X})$ represent a translation operator that shifts an image $\mathbf{X}$ by $s$ pixels.
 - A convolutional layer $C$ is equivariant because shifting the input shifts the output feature map:
-  $$C(T_s(\mathbf{X})) = T_s(C(\mathbf{X}))$$
+   $$C(T_s(\mathbf{X})) = T_s(C(\mathbf{X}))$$
 - A pooling layer $P$ extracts the maximum value within local windows. If we shift the input slightly such that the peak feature remains within the same pooling window, the output value remains identical:
-  $$P(C(T_s(\mathbf{X}))) \approx P(C(\mathbf{X}))$$
-
-```
-       Equivariance (Conv): Input shifts -> Feature shifts
-       [Cat in Left]  ---> Conv ---> [Activation on Left]
-       [Cat in Right] ---> Conv ---> [Activation on Right]
-       
-       Invariance (Conv + Pool): Input shifts -> Output constant
-       [Cat in Left]  ---> Conv + Pool + Dense ---> Class: "Cat"
-       [Cat in Right] ---> Conv + Pool + Dense ---> Class: "Cat"
-```
+   $$P(C(T_s(\mathbf{X}))) \approx P(C(\mathbf{X}))$$
 
 By stacking convolutional and pooling layers, the network builds spatial abstraction layer by layer. Early layers track exactly where edges are located (high equivariance). Deeper layers only track the presence of complex objects ("eye," "nose") within general regions, culminating in a classification decision that is invariant to shifts.
+
+### Python Code Implementation
+Here is a Python script demonstrating translational equivariance in convolutions and local translational invariance in MaxPooling:
+
+```python
+import numpy as np
+
+# Simple convolve function (valid padding, stride=1)
+def convolve(img, k):
+    h, w = img.shape
+    kh, kw = k.shape
+    out = np.zeros((h - kh + 1, w - kw + 1))
+    for i in range(h - kh + 1):
+        for j in range(w - kw + 1):
+            out[i, j] = np.sum(img[i:i+kh, j:j+kw] * k)
+    return out
+
+# Simple 2D maxpool function (stride 2)
+def maxpool(img):
+    h, w = img.shape
+    out = np.zeros((h // 2, w // 2))
+    for i in range(h // 2):
+        for j in range(w // 2):
+            out[i, j] = np.max(img[2*i:2*i+2, 2*j:2*j+2])
+    return out
+
+# Define original input with a line in column 1 (0-indexed)
+x = np.array([
+    [0, 10, 0, 0, 0, 0],
+    [0, 10, 0, 0, 0, 0],
+    [0, 10, 0, 0, 0, 0],
+    [0, 10, 0, 0, 0, 0],
+    [0, 10, 0, 0, 0, 0],
+    [0, 10, 0, 0, 0, 0]
+])
+
+# Shift input to the right by 1 pixel (line in column 2)
+x_shifted = np.array([
+    [0, 0, 10, 0, 0, 0],
+    [0, 0, 10, 0, 0, 0],
+    [0, 0, 10, 0, 0, 0],
+    [0, 0, 10, 0, 0, 0],
+    [0, 0, 10, 0, 0, 0],
+    [0, 0, 10, 0, 0, 0]
+])
+
+# Edge detector kernel
+kernel = np.array([
+    [0, 1, 0],
+    [0, 1, 0],
+    [0, 1, 0]
+])
+
+c = convolve(x, kernel)
+c_shifted = convolve(x_shifted, kernel)
+
+print("--- Convolutions are Equivariant ---")
+print("Conv Output (Original):\n", c)
+print("Conv Output (Shifted):\n", c_shifted)
+# The output feature maps are shifted by exactly 1 column (equivariance!)
+
+p = maxpool(c)
+p_shifted = maxpool(c_shifted)
+
+print("\n--- MaxPooling adds Invariance ---")
+print("Pool Output (Original):\n", p)
+print("Pool Output (Shifted):\n", p_shifted)
+# Because the shift occurred within the boundaries of the pooling window,
+# the output remains exactly the same (invariance!).
+```
 
 ### Trade-offs
 Translational invariance is highly beneficial for image classification because it allows the model to generalize across object positions.
@@ -126,7 +211,7 @@ The trade-off is the loss of spatial relationships. If a network is completely t
 ## Topic 3: Average Pooling vs Global Average Pooling (GAP)
 
 ### Rationale and Mechanics
-While MaxPooling extracts the maximum value within a window, **Average Pooling (AvgPool)** computes the average value. 
+While MaxPooling extracts the maximum value within a window, **Average Pooling (AvgPool)** computes the average value.
 
 More importantly, modern architectures use **Global Average Pooling (GAP)**, introduced by Min Lin, Qiang Chen, and Shuicheng Yan in 2013, as a replacement for dense layers at the end of CNNs.
 
@@ -138,20 +223,54 @@ $$z_c = \frac{1}{H \times W} \sum_{i=1}^H \sum_{j=1}^W X(i, j, c)$$
 This collapses the 3D tensor of shape $(H, W, C)$ into a 1D vector of shape:
 $$\text{Output Shape} = (C,)$$
 
-```
-        Final Feature Map (7x7x512)              Global Average Pooling
-                                                 
-        [ 7x7 Grid ] Channel 1 ------> Average ------> [ Val 1 ]
-        [ 7x7 Grid ] Channel 2 ------> Average ------> [ Val 2 ]  Shape: (512,)
-        [   ...    ]             
-        [ 7x7 Grid ] Channel 512 ----> Average ------> [ Val 512 ]
-```
-
 This 1D vector of size $C$ is passed directly to the Softmax output layer.
+
+### Python Code Implementation
+Here is a Python script illustrating the mathematical calculations of Average Pooling vs. Global Average Pooling on a sample 3D feature tensor using NumPy:
+
+```python
+import numpy as np
+
+# A small feature tensor of shape (H=4, W=4, C=2) representing 2 feature maps
+np.random.seed(42)
+feature_tensor = np.random.randint(0, 10, size=(4, 4, 2)).astype(float)
+print("--- Input Feature Tensor (Channel 0) ---")
+print(feature_tensor[:, :, 0])
+print("\n--- Input Feature Tensor (Channel 1) ---")
+print(feature_tensor[:, :, 1])
+
+# 1. Standard Average Pooling (2x2 window, stride 2)
+def average_pool_2d(tensor, pool_size=2, stride=2):
+    h, w, c = tensor.shape
+    h_out = (h - pool_size) // stride + 1
+    w_out = (w - pool_size) // stride + 1
+    out = np.zeros((h_out, w_out, c))
+    
+    for ch in range(c):
+        for i in range(h_out):
+            for j in range(w_out):
+                patch = tensor[i*stride : i*stride+pool_size, j*stride : j*stride+pool_size, ch]
+                out[i, j, ch] = np.mean(patch)
+    return out
+
+avg_pooled = average_pool_2d(feature_tensor)
+print("\n--- Standard Average Pooling Output (2x2, stride=2) (Shape: {}) ---".format(avg_pooled.shape))
+print("Channel 0:\n", avg_pooled[:, :, 0])
+print("Channel 1:\n", avg_pooled[:, :, 1])
+
+# 2. Global Average Pooling (averages entire spatial dimension)
+def global_average_pooling(tensor):
+    # Mean along height (axis 0) and width (axis 1)
+    return np.mean(tensor, axis=(0, 1))
+
+gap_output = global_average_pooling(feature_tensor)
+print("\n--- Global Average Pooling Output (Shape: {}) ---".format(gap_output.shape))
+print("Output Vector:", gap_output)
+```
 
 ### Trade-offs
 - **Average Pooling vs MaxPooling:** MaxPooling acts as a noise filter, selecting the most prominent features. Average Pooling acts as a smoothing filter, preserving average background information. MaxPooling is generally preferred for feature extraction in CNNs.
-- **Global Average Pooling vs Flattening + Dense:** 
+- **Global Average Pooling vs Flattening + Dense:**
   - **Flattening + Dense:** A feature map of shape $(7, 7, 512)$ flattened and connected to a $1,000$-unit dense layer requires $7 \times 7 \times 512 \times 1000 \approx 25 \text{ million parameters}$, leading to overfitting.
   - **Global Average Pooling:** Converts $(7, 7, 512)$ to a $(512,)$ vector with **zero parameters**, preventing overfitting and significantly reducing model size.
   Additionally, GAP makes the model robust to spatial translations of the entire object.
@@ -180,7 +299,7 @@ This 1D vector of size $C$ is passed directly to the Softmax output layer.
 
 ---
 
-## Topic 3: Summary & Next Steps
+## Summary & Next Steps
 
 - **MaxPooling Downsamples Spatial Data:** MaxPooling extracts peak activations from local windows, reducing spatial dimensions by $75\%$ and saving memory.
 - **Translational Invariance vs Equivalence:** Convolutions are equivariant (features shift with the input). Pooling adds invariance, allowing the model to recognize objects regardless of their position.

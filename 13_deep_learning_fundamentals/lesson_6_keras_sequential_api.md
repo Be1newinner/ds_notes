@@ -21,18 +21,43 @@ $$\text{Shape} = (N, D)$$
 When defining the input layer in Keras, we use the `Input` layer or `input_shape` argument. Crucially, we specify the shape of a **single sample**, excluding the batch dimension:
 $$\text{Input Shape} = (D,)$$
 
-```
-        Raw Data Matrix (N samples, D features)
-        
-        [  f1   f2   f3  ...  fD  ] - Sample 1
-        [  f1   f2   f3  ...  fD  ] - Sample 2
-        [  ...  ...  ...  ...  ... ]
-        [  f1   f2   f3  ...  fD  ] - Sample N
-        
-        Mapped to Keras: Input(shape=(D,))  <-- Batch dimension is dynamic
-```
-
 We omit the batch dimension $N$ because it is dynamic: the network can process a single sample during inference, or batches of 32, 64, or 128 samples during training. Keras handles the batch dimension automatically at runtime, representing a batch of size $B$ as a tensor of shape $(B, D)$.
+
+### Python Code Implementation
+Here is a Python example showing how to preprocess tabular data using Pandas and Scikit-Learn, inspect the output matrix shape, and map it to a Keras input tensor shape:
+
+```python
+import numpy as np
+import pandas as pd
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+
+# Synthetic dataset: 5 samples, features: age, income, and membership type (Silver, Gold, Platinum)
+df = pd.DataFrame({
+    'age': [25, 45, 35, 50, 23],
+    'income': [50000, 120000, 85000, 150000, 48000],
+    'membership': ['Silver', 'Gold', 'Silver', 'Platinum', 'Gold']
+})
+
+# Define the preprocessor
+preprocessor = ColumnTransformer(
+    transformers=[
+        ('num', StandardScaler(), ['age', 'income']),
+        ('cat', OneHotEncoder(sparse_output=False), ['membership'])
+    ]
+)
+
+# Preprocess the DataFrame into a NumPy matrix
+X_processed = preprocessor.fit_transform(df)
+
+print("Original DataFrame:\n", df)
+print("\nProcessed NumPy Matrix:\n", np.round(X_processed, 4))
+print("\nProcessed Matrix Shape:", X_processed.shape)
+
+# Extract feature count for Keras input layer
+keras_input_shape = (X_processed.shape[1],)
+print("Expected Input Shape for Keras Input Layer:", keras_input_shape)
+```
 
 ### Trade-offs
 Defining input shapes explicitly is a best practice in modern Keras. It allows the framework to construct and initialize all weight matrices immediately. If you omit the input shape, Keras defers weight creation until you pass the first batch of data. This delayed initialization prevents you from inspecting the model summary or saving the model before training.
@@ -91,6 +116,37 @@ Let's analyze the shapes of the parameters (weights and biases) initialized by t
   - Total parameters: $32 \times 1 + 1 = 33$
 
 The activation argument (e.g., `'relu'`, `'sigmoid'`) determines the non-linear function applied to the pre-activations of each layer.
+
+### Python Code Implementation
+Here is a Python script creating a Sequential model in Keras and printing the shapes of its weight matrices and bias vectors:
+
+```python
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# Design the MLP model
+model = keras.Sequential([
+    layers.Input(shape=(10,)),  # D = 10 features
+    layers.Dense(32, activation='relu', name='hidden_1'),
+    layers.Dense(16, activation='relu', name='hidden_2'),
+    layers.Dense(1, activation='sigmoid', name='output')
+])
+
+# Print the model structure and parameter shapes
+model.summary()
+
+print("\n--- Parameter Details ---")
+for layer in model.layers:
+    # Retrieve weights and biases
+    weights = layer.get_weights()
+    if len(weights) > 0:
+        w_matrix, b_vector = weights
+        print(f"Layer: {layer.name}")
+        print(f"  Weights shape: {w_matrix.shape}")
+        print(f"  Biases shape : {b_vector.shape}")
+        print(f"  Total params : {w_matrix.size + b_vector.size}")
+```
 
 ### Trade-offs
 The Sequential API is highly readable and easy to debug, making it the default choice for standard feedforward and simple convolutional networks.
@@ -177,6 +233,52 @@ Under the hood, `model.fit()` executes the training loop over the specified numb
 5. At the end of the epoch, the validation dataset is passed forward to calculate the validation loss and metrics. Crucially, validation data is only used for evaluation; it does not update the weights.
 
 The training history (losses and metrics for both training and validation sets) is returned in the `history` object, which can be plotted to monitor convergence.
+
+### Python Code Implementation
+Here is a complete Python script generating synthetic binary classification data, compiling and training a Keras model, and parsing the history dict:
+
+```python
+import numpy as np
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# Generate synthetic binary classification data
+np.random.seed(42)
+X_train = np.random.randn(1000, 10)
+y_train = np.random.randint(0, 2, size=(1000, 1))
+
+# Design the network
+model = keras.Sequential([
+    layers.Input(shape=(10,)),
+    layers.Dense(16, activation='relu'),
+    layers.Dense(1, activation='sigmoid')
+])
+
+# Compile the model
+model.compile(
+    optimizer='adam',
+    loss='binary_crossentropy',
+    metrics=['accuracy']
+)
+
+# Fit the model and store the history
+history = model.fit(
+    X_train, y_train,
+    epochs=5,
+    batch_size=32,
+    validation_split=0.2,
+    verbose=1
+)
+
+# Inspect the training history dict
+print("\n--- Training History Keys ---")
+print(history.history.keys())
+
+print("\n--- Loss Values over Epochs ---")
+for epoch, (loss, val_loss) in enumerate(zip(history.history['loss'], history.history['val_loss'])):
+    print(f"Epoch {epoch+1} -> Train Loss: {loss:.4f} | Val Loss: {val_loss:.4f}")
+```
 
 ### Trade-offs
 Hyperparameter selection in `model.fit()` involves significant trade-offs:

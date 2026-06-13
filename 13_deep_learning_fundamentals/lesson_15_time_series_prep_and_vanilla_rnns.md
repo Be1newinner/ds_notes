@@ -27,22 +27,51 @@ Where:
 
 At each individual timestep $t \in \{1, \dots, T\}$, the input is a feature vector $\mathbf{x}_t \in \mathbb{R}^D$.
 
-```
-       3D Tensor Structure: (Samples, Timesteps, Features)
-       
-       Sample 1:
-       [ x_11  x_12  ...  x_1D ] - Timestep 1
-       [ x_21  x_22  ...  x_2D ] - Timestep 2
-       [ ...   ...   ...  ...  ]
-       [ x_T1  x_T2  ...  x_TD ] - Timestep T
-       
-       Stacked for N samples along the 3rd axis.
-```
-
 To prepare tabular time-series data for an RNN, we apply a sliding window function:
 1. Choose a sequence length $T$ (lookback window).
 2. Slide the window across the chronological series, extracting $T$ historical steps as the input matrix and the step $T+1$ as the target label.
 3. Stack these windows to form the $(N, T, D)$ input tensor.
+
+### Python Code Implementation
+Here is a Python function implementing a sliding window function from scratch, converting a 1D time-series into a 3D tensor ready for RNN training:
+
+```python
+import numpy as np
+
+def create_rnn_sliding_windows(series, lookback):
+    X = []
+    y = []
+    
+    # Slide lookback window across the series
+    for i in range(len(series) - lookback):
+        # Input window: features from t to t + lookback - 1
+        X.append(series[i : i + lookback])
+        # Target label: value at t + lookback
+        y.append(series[i + lookback])
+        
+    # Convert lists to NumPy arrays
+    X_array = np.array(X)
+    y_array = np.array(y)
+    
+    # Reshape X from (N, T) to 3D (N, T, D) where D = 1 feature
+    X_3d = X_array[..., np.newaxis]
+    
+    return X_3d, y_array
+
+# Continuous stock price values over 8 days
+raw_prices = np.array([100.0, 101.5, 102.0, 101.0, 103.5, 104.0, 103.0, 105.0])
+lookback_length = 3
+
+X_train, y_train = create_rnn_sliding_windows(raw_prices, lookback=lookback_length)
+
+print("Raw Prices Series:", raw_prices)
+print("\n--- Sliding Windows Created (Lookback = 3) ---")
+for i in range(len(X_train)):
+    print(f"Sample {i} | Input (x):\n{X_train[i].squeeze()} -> Target (y): {y_train[i]}")
+
+print("\nFinal Input Tensor Shape (Samples, Timesteps, Features):", X_train.shape)
+print("Final Target Tensor Shape:", y_train.shape)
+```
 
 ### Trade-offs
 The 3D tensor convention allows Keras RNN layers to dynamically process sequences of varying lengths: Keras input layers can be defined as `Input(shape=(None, D))`, where `None` indicates that the sequence length $T$ is determined at runtime.
@@ -84,15 +113,47 @@ Under the hood, at each timestep $t \in \{1, \dots, T\}$:
    $$\mathbf{y}_t = g\left( \mathbf{W}_{hy} \mathbf{h}_t + \mathbf{b}_y \right)$$
    where $\mathbf{W}_{hy}$ is the Hidden-to-Output weight matrix (shape: $O \times H$), $\mathbf{b}_y$ is the output bias, and $g(\cdot)$ is the output activation (e.g., Softmax or Linear).
 
-```
-                 h_t-1 -------\
-                              v
-       x_t ---> [ W_xh ] ---> [ Sum ] ---> Tanh ---> h_t ---> [ W_hy ] ---> y_t
-                               ^
-       b_h -------------------/
-```
-
 Crucially, the weight matrices $\mathbf{W}_{xh}$, $\mathbf{W}_{hh}$, and $\mathbf{W}_{hy}$ are **shared across time**. The exact same parameters are applied at timestep 1, timestep 2, and timestep $T$. This parameter sharing allows the network to generalize patterns across different temporal positions and process sequences of any length.
+
+### Python Code Implementation
+Here is a Python script implementing the forward propagation of a single RNN cell step-by-step over a sequence using NumPy:
+
+```python
+import numpy as np
+
+def rnn_cell_forward(x_t, h_prev, W_xh, W_hh, b_h):
+    # h_t = tanh( W_hh * h_prev + W_xh * x_t + b_h )
+    pre_activation = np.dot(W_hh, h_prev) + np.dot(W_xh, x_t) + b_h
+    h_t = np.tanh(pre_activation)
+    return h_t
+
+# Define shapes: input feature D=2, hidden units H=3
+D = 2
+H = 3
+
+# Sample sequence of length T=3
+X_sequence = np.array([
+    [1.0, -0.5],  # x_1
+    [0.5,  2.0],  # x_2
+    [-1.0, 0.0]   # x_3
+])
+
+# Initialize weight matrices and bias
+np.random.seed(42)
+W_xh = np.random.randn(H, D)
+W_hh = np.random.randn(H, H)
+b_h = np.zeros(H)
+
+# Initialize initial hidden state h_0 as zeros
+h_t = np.zeros(H)
+
+print("Starting State h_0:", h_t)
+
+# Loop through each step in the sequence
+for t, x_t in enumerate(X_sequence):
+    h_t = rnn_cell_forward(x_t, h_t, W_xh, W_hh, b_h)
+    print(f"Step {t+1} (x_t={x_t}) -> Hidden State h_{t+1}: {np.round(h_t, 4)}")
+```
 
 ### Trade-offs
 - **Advantages:** The parameter sharing design keeps the network size independent of sequence length, restricting parameter counts and preventing overfitting.
@@ -133,14 +194,6 @@ Under the hood:
 - **Many-to-Many (return_sequences=True):** The model outputs the hidden state $\mathbf{h}_t$ at *every* timestep, returning a sequence of hidden states $[\mathbf{h}_1, \dots, \mathbf{h}_T]$. This is used when the output must align with each input timestep (e.g., POS tagging).
 - **One-to-Many:** The network receives a single input vector $\mathbf{x}$ and generates a sequence of outputs $[\mathbf{y}_1, \dots, \mathbf{y}_T]$ (e.g., generating a caption from an image).
 
-```
-       Many-to-One:                             Many-to-Many:
-       
-       x1 ---> RNN ---> h1                      x1 ---> RNN ---> h1 ---> y1
-       x2 ---> RNN ---> h2                      x2 ---> RNN ---> h2 ---> y2
-       x3 ---> RNN ---> h3 ---> y3              x3 ---> RNN ---> h3 ---> y3
-```
-
 In Keras, nesting RNN layers requires setting `return_sequences=True` on all hidden RNN layers, as a downstream RNN layer requires a 3D tensor input:
 ```python
 model = keras.Sequential([
@@ -148,6 +201,42 @@ model = keras.Sequential([
     keras.layers.SimpleRNN(32, return_sequences=False),
     keras.layers.Dense(1)
 ])
+```
+
+### Python Code Implementation
+Here is a Python script using Keras to build and compare Many-to-One and Many-to-Many RNN architectures, showing their output shapes on a dummy batch:
+
+```python
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+import numpy as np
+
+# Create a dummy batch: 1 sample, 5 timesteps, 2 features
+dummy_batch = np.random.randn(1, 5, 2)
+
+# 1. Many-to-One Model (return_sequences=False)
+model_many_to_one = keras.Sequential([
+    layers.Input(shape=(5, 2)),
+    layers.SimpleRNN(4, return_sequences=False)  # Hidden units H = 4
+])
+
+# 2. Many-to-Many Model (return_sequences=True)
+model_many_to_many = keras.Sequential([
+    layers.Input(shape=(5, 2)),
+    layers.SimpleRNN(4, return_sequences=True)   # Hidden units H = 4
+])
+
+print("Dummy Batch Shape:", dummy_batch.shape)
+print("\n--- Many-to-One Architecture ---")
+output_one = model_many_to_one.predict(dummy_batch)
+print("Output Shape (Batch, Hidden_Units):", output_one.shape)
+print("Output Matrix:\n", np.round(output_one, 4))
+
+print("\n--- Many-to-Many Architecture ---")
+output_many = model_many_to_many.predict(dummy_batch)
+print("Output Shape (Batch, Timesteps, Hidden_Units):", output_many.shape)
+print("Output Tensor:\n", np.round(output_many, 4))
 ```
 
 ### Trade-offs

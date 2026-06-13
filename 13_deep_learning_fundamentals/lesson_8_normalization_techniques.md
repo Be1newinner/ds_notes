@@ -2,7 +2,7 @@
 
 ## Introduction & The "Why"
 
-In classical machine learning, we scale our input features (e.g., using Scikit-Learn's `StandardScaler`) to ensure they all have zero mean and unit variance. This preprocessing steps ensures that the optimization landscape is balanced, preventing features with large scales from dominating the gradient updates. However, this only solves the problem for the first layer.
+In classical machine learning, we scale our input features (e.g., using Scikit-Learn's `StandardScaler`) to ensure they all have zero mean and unit variance. This preprocessing step ensures that the optimization landscape is balanced, preventing features with large scales from dominating the gradient updates. However, this only solves the problem for the first layer.
 
 As activations flow deeper into a multi-layer neural network, they are multiplied by weight matrices at each layer. As training progresses and weights are updated, the distribution of inputs to deeper layers changes constantly. This shifting of intermediate distributions is called **Internal Covariate Shift**. It forces downstream layers to continuously adapt to new distributions, stalling training and requiring tiny learning rates.
 
@@ -20,16 +20,35 @@ $$\mathbf{z}^{(l)} = \mathbf{W}^{(l)} \mathbf{a}^{(l-1)} + \mathbf{b}^{(l)}$$
 
 As the optimizer updates the parameters of the early layers ($\mathbf{W}^{(1)}, \mathbf{W}^{(2)}, \dots$), the distribution of activations $\mathbf{a}^{(l-1)}$ shifts. This means the downstream layer $l$ is constantly chasing a moving target: it must adapt its weights $\mathbf{W}^{(l)}$ to classify features whose mean, variance, and range are continuously drifting.
 
-```
-       [Input Layer] ---> [Layer 1] ---> [Layer 2] ---> [Layer 3]
-             |                 |               |
-          Constant          Updates         Updates
-        Distribution         Shift           Shift
-                          Distribution    Distribution
-                          (Covariate)     (Covariate)
-```
-
 This distribution drift scales exponentially with network depth. A tiny change in the weights of Layer 1 can cause massive shifts in Layer 10. This drift is particularly problematic when using saturating activation functions like Sigmoid or Tanh: if the distribution shifts into the flat regions ($|z| > 5$), the gradients vanish, and training stalls completely.
+
+### Python Code Implementation
+Here is a Python script using NumPy to simulate how activation distributions drift and scale out of control as they propagate through multiple layers without normalization:
+
+```python
+import numpy as np
+
+# Set random seed for reproducibility
+np.random.seed(42)
+
+# Simulate 100 samples with 10 features (mean=0, var=1)
+X = np.random.randn(100, 10)
+print(f"Layer 0 (Input)  | Mean: {X.mean():7.4f} | Var: {X.var():7.4f}")
+
+# Propagate through 3 layers with unnormalized weight transformations and ReLU
+a = X
+for layer in range(1, 4):
+    # Initialize weights with a slight positive bias and variance > 1
+    W = np.random.randn(10, 10) * 1.2 + 0.1
+    b = np.random.randn(10) * 0.2
+    
+    # Linear projection
+    z = np.dot(a, W) + b
+    # ReLU activation
+    a = np.maximum(0, z)
+    
+    print(f"Layer {layer:1d} (Outputs) | Mean: {a.mean():7.4f} | Var: {a.var():7.4f}")
+```
 
 ### Trade-offs
 Preventing internal covariate shift is essential for training deep architectures. By standardizing intermediate distributions, we decouple the learning of different layers. Each layer can learn independently of changes in the distributions of earlier layers.
@@ -72,22 +91,65 @@ Under the hood, let's consider a mini-batch $\mathcal{B} = \{x_1, \dots, x_m\}$ 
    $$y_i = \gamma \hat{x}_i + \beta$$
    where $\gamma$ and $\beta$ are **learnable parameters** unique to each neuron.
 
-```
-       Batch Dimension (m samples)
-       |
-       |  [ x11  x12  x13 ] - Sample 1
-       |  [ x21  x22  x23 ] - Sample 2
-       |  [ x31  x32  x33 ] - Sample 3
-       v
-          Mean/Var calculated down the column (across samples)
-```
-
 The scale ($\gamma$) and shift ($\beta$) parameters are critical: if standardizing the activations to zero mean and unit variance reduces the model's capacity (for example, by forcing inputs into the linear region of a Sigmoid function), the network can learn to set $\gamma = \sigma$ and $\beta = \mu$ to restore the original distribution. These parameters are optimized during training via backpropagation.
 
 During inference, we cannot calculate batch statistics because we might make predictions on a single sample ($m = 1$). To handle this, BatchNorm tracks running averages of the mean and variance during training:
 $$\mu_{\text{running}} \leftarrow \alpha \mu_{\text{running}} + (1 - \alpha) \mu_{\mathcal{B}}$$
 $$\sigma^2_{\text{running}} \leftarrow \alpha \sigma^2_{\text{running}} + (1 - \alpha) \sigma^2_{\mathcal{B}}$$
 where $\alpha \approx 0.99$ is a momentum hyperparameter. These running statistics are used to normalize inputs during testing.
+
+### Python Code Implementation
+Here is a Python class implementing Batch Normalization forward propagation from scratch, covering both training and inference modes:
+
+```python
+import numpy as np
+
+class BatchNormScratch:
+    def __init__(self, num_features, momentum=0.9, eps=1e-5):
+        self.momentum = momentum
+        self.eps = eps
+        
+        # Learnable scale (gamma) and shift (beta) parameters
+        self.gamma = np.ones(num_features)
+        self.beta = np.zeros(num_features)
+        
+        # Running statistics for inference
+        self.running_mean = np.zeros(num_features)
+        self.running_var = np.ones(num_features)
+
+    def forward(self, X, training=True):
+        if training:
+            # Mean and variance across the batch dimension (axis 0)
+            mean = np.mean(X, axis=0)
+            var = np.var(X, axis=0)
+            
+            # Normalize inputs
+            X_norm = (X - mean) / np.sqrt(var + self.eps)
+            
+            # Update running stats using momentum
+            self.running_mean = self.momentum * self.running_mean + (1.0 - self.momentum) * mean
+            self.running_var = self.momentum * self.running_var + (1.0 - self.momentum) * var
+        else:
+            # Normalize using tracked running statistics during test time
+            X_norm = (X - self.running_mean) / np.sqrt(self.running_var + self.eps)
+            
+        # Apply learnable scale and shift
+        return self.gamma * X_norm + self.beta
+
+# Test BatchNorm on a batch of 3 samples and 2 features
+batch_data = np.array([[2.0, 10.0],
+                       [4.0, 20.0],
+                       [6.0, 30.0]])
+
+bn = BatchNormScratch(num_features=2, momentum=0.9)
+print("--- Training Mode Output ---")
+print(bn.forward(batch_data, training=True))
+print("Tracked Running Mean:", bn.running_mean)
+
+print("\n--- Inference Mode Output (Single Sample) ---")
+test_sample = np.array([[3.0, 15.0]])
+print(bn.forward(test_sample, training=False))
+```
 
 ### Trade-offs
 BatchNorm stabilizes training, allows for higher learning rates, and acts as a regularizer. Because $\mu_{\mathcal{B}}$ and $\sigma_{\mathcal{B}}^2$ are calculated over a random mini-batch, they contain stochastic noise. This noise is passed to the activations, acting as a form of regularization that reduces overfitting.
@@ -133,14 +195,42 @@ Under the hood, let's consider a layer with $H$ hidden units (features). For a s
    $$y_j = \gamma_j \hat{h}_j + \beta_j$$
    where $\gamma_j$ and $\beta_j$ are learnable parameters unique to feature coordinate $j$.
 
-```
-       Batch Dimension (m samples)
-          [ h11  h12  h13 ] - Sample 1  ---> Mean/Var calculated across
-          [ h21  h22  h23 ] - Sample 2       features (along the row)
-          [ h31  h32  h33 ] - Sample 3
-```
-
 Crucially, LayerNorm performs its calculations independently for each sample. This means the mean and variance are calculated along the rows (features) rather than down the columns (samples).
+
+### Python Code Implementation
+Here is a Python function implementing Layer Normalization, showing how it normalizes along the feature axis for each sample independently:
+
+```python
+import numpy as np
+
+def layer_normalization(X, gamma, beta, eps=1e-5):
+    # Calculate mean and variance across features (axis 1)
+    # keepdims=True is necessary for correct broadcasting shape (N, 1)
+    mean = np.mean(X, axis=1, keepdims=True)
+    var = np.var(X, axis=1, keepdims=True)
+    
+    # Normalize features
+    X_norm = (X - mean) / np.sqrt(var + eps)
+    
+    # Scale and shift (gamma and beta are vectors of shape (features,))
+    return gamma * X_norm + beta
+
+# Simulating a batch of 3 samples with 4 features each
+batch_data = np.array([[1.0, 2.0, 5.0, 8.0],
+                       [10.0, 20.0, 30.0, 40.0],
+                       [-1.0, 0.0, 1.0, 2.0]])
+
+# Initialize learnable parameters
+gamma = np.ones(4)
+beta = np.zeros(4)
+
+normalized_data = layer_normalization(batch_data, gamma, beta)
+print("Original Batch Data:\n", batch_data)
+print("\nLayerNorm Normalized Output:\n", np.round(normalized_data, 4))
+# Check that the mean of each row is 0.0 and variance is 1.0
+print("\nRow Means:", np.round(normalized_data.mean(axis=1), 4))
+print("Row Vars :", np.round(normalized_data.var(axis=1), 4))
+```
 
 ### Trade-offs
 LayerNorm offers significant advantages for sequential and transformer models:

@@ -17,19 +17,46 @@ In classical signal processing and state-space systems (like Kalman filters), we
 1. **Hidden State ($\mathbf{h}_t$):** The short-term memory vector, which is passed to downstream layers and output predictions.
 2. **Cell State ($\mathbf{C}_t$):** The long-term memory vector (conveyor belt) that runs through the entire sequence with only minor linear modifications.
 
-```
-       Cell State (C_t-1) ----------( Linear Updates )-----------> Cell State (C_t)
-                                           ^
-       Short Memory (h_t-1) -\             |                 /---> Short Memory (h_t)
-                              +---> [ LSTM Gates ] ---------/
-       Current Input (x_t)  -/
-```
-
 The cell state is modified by **Gates**. A gate is a vector of values in the range $[0, 1]$ calculated using a Sigmoid activation function. When we perform element-wise (Hadamard) multiplication between a gate vector and a state vector, the gate controls how much information passes through:
 - **Gate = 0:** The gate is closed; all information is blocked/erased.
 - **Gate = 1:** The gate is open; all information passes through unchanged.
 
 During backpropagation, the gradient flows directly along the cell state conveyor belt. Because the modifications to the cell state are linear addition operations rather than repeated matrix multiplications, the gradient does not decay. This pathway is called the **Constant Error Carousel (CEC)**, and it is the core reason why LSTMs solve the vanishing gradient problem.
+
+### Python Code Implementation
+Here is a Python script simulating gradient flow through a sequence of 50 timesteps, comparing how the error signal decays in a Vanilla RNN vs. how it remains constant along the LSTM Cell State conveyor belt (CEC):
+
+```python
+import numpy as np
+
+def simulate_gradient_flow(timesteps=50):
+    # Vanilla RNN: Repeated multiplication by a weight (e.g., 0.9) and activation slope (e.g., 0.8)
+    rnn_multiplier = 0.9 * 0.8
+    rnn_grad = 1.0
+    rnn_history = []
+    
+    # LSTM Cell State: Additive pathway where the multiplier is the forget gate (e.g., f_t = 1.0)
+    lstm_multiplier = 1.0
+    lstm_grad = 1.0
+    lstm_history = []
+    
+    for step in range(timesteps):
+        rnn_grad *= rnn_multiplier
+        lstm_grad *= lstm_multiplier
+        
+        rnn_history.append(rnn_grad)
+        lstm_history.append(lstm_grad)
+        
+    return rnn_history, lstm_history
+
+rnn_flow, lstm_flow = simulate_gradient_flow(timesteps=50)
+
+print("--- Gradient Remaining After Steps ---")
+print("Step | Vanilla RNN | LSTM Cell State (CEC)")
+print("------------------------------------------")
+for step in [0, 4, 9, 19, 49]:
+    print(f"{step+1:4d} | {rnn_flow[step]:11.6f} | {lstm_flow[step]:21.6f}")
+```
 
 ### Trade-offs
 LSTMs can learn dependencies spanning hundreds of timesteps, making them highly effective for translation, speech processing, and anomaly detection in long time-series.
@@ -47,7 +74,7 @@ The trade-off is architectural complexity. An LSTM requires four distinct intern
 3. **Example 3: Text Document Processing**
    - **Input/Scenario:** A text summary model processes a long article. In the first sentence, it reads "The author was born in France." The model must retain the concept "France" to classify the author's nationality at the end of the text.
    - **Expected Output:** The LSTM stores the "France" activation in the cell state conveyor belt, bypassing intermediate paragraphs without modification until it reaches the final sentence.
-4. **Example 4: Code Implementation**
+4. **Example 4: Code Integration**
    - **Input/Scenario:** A developer instantiates an LSTM layer in Keras.
    - **Expected Output:**
      ```python
@@ -65,20 +92,6 @@ The trade-off is architectural complexity. An LSTM requires four distinct intern
 
 ### Rationale and Mechanics
 To manage the cell state, an LSTM cell uses three gates: the **Forget Gate**, the **Input Gate**, and the **Output Gate**. These gates are computed using the current input $\mathbf{x}_t$ and the previous hidden state $\mathbf{h}_{t-1}$.
-
-```
-                 C_t-1 ---> [  x  ] ---------------------> [  +  ] ---> C_t
-                             ^                              ^
-                             | Forget Gate (f_t)            | Input Gate (i_t) * Candidate (C~_t)
-                 h_t-1 -\    |                              |
-                         +-> [ Gates / Candidate Generator ]
-                 x_t   -/    |
-                             v Output Gate (o_t)
-                             [  x  ] ---------------------------------> h_t
-                             ^
-                             |
-                           Tanh(C_t)
-```
 
 Under the hood, at each timestep $t$:
 1. **The Forget Gate ($f_t$):** Determines what information to discard from the cell state. It outputs a vector of values between 0 and 1:
@@ -99,6 +112,64 @@ This additive state update ($\mathbf{C}_t = f_t \odot \mathbf{C}_{t-1} + i_t \od
 $$\frac{\partial \mathbf{C}_t}{\partial \mathbf{C}_{t-1}} = f_t$$
 
 If the forget gate is fully open ($f_t = 1.0$), the derivative is exactly $1.0$. Gradients can flow back indefinitely without decay, preventing vanishing gradients.
+
+### Python Code Implementation
+Here is a Python function implementing a single forward pass of an LSTM cell from scratch using NumPy, showing how the three gates manage the cell state and hidden state vectors:
+
+```python
+import numpy as np
+
+def sigmoid(z):
+    return 1.0 / (1.0 + np.exp(-z))
+
+def lstm_cell_forward(x_t, h_prev, C_prev, weights, biases):
+    # Concatenate previous hidden state and current input
+    concat = np.concatenate([h_prev, x_t])
+    
+    # Unpack weights and biases for the 4 sub-layers
+    W_f, W_i, W_c, W_o = weights
+    b_f, b_i, b_c, b_o = biases
+    
+    # 1. Compute gates
+    f_t = sigmoid(np.dot(W_f, concat) + b_f)
+    i_t = sigmoid(np.dot(W_i, concat) + b_i)
+    C_tilde = np.tanh(np.dot(W_c, concat) + b_c)
+    o_t = sigmoid(np.dot(W_o, concat) + b_o)
+    
+    # 2. Update cell state
+    C_t = f_t * C_prev + i_t * C_tilde
+    
+    # 3. Update hidden state
+    h_t = o_t * np.tanh(C_t)
+    
+    return h_t, C_t, (f_t, i_t, C_tilde, o_t)
+
+# Setup dimensions: Input D=2, Hidden H=3
+D = 2
+H = 3
+
+# Initialize weights and biases randomly for the 4 paths
+np.random.seed(42)
+weights = [np.random.randn(H, H + D) for _ in range(4)]
+biases = [np.zeros(H) for _ in range(4)]
+
+# Inputs
+x_t = np.array([1.0, -0.5])
+h_prev = np.array([0.1, -0.2, 0.0])
+C_prev = np.array([0.5, 0.5, 0.5])
+
+# Forward pass
+h_t, C_t, gates = lstm_cell_forward(x_t, h_prev, C_prev, weights, biases)
+f_t, i_t, C_tilde, o_t = gates
+
+print("--- LSTM Gate Activations ---")
+print("Forget Gate (f_t):", np.round(f_t, 4))
+print("Input Gate  (i_t):", np.round(i_t, 4))
+print("Output Gate (o_t):", np.round(o_t, 4))
+print("\n--- Updated States ---")
+print("New Cell State (C_t)  :", np.round(C_t, 4))
+print("New Hidden State (h_t):", np.round(h_t, 4))
+```
 
 ### Trade-offs
 The gating mechanism provides precise control over memory: the cell can choose to forget irrelevant history (e.g., when a sentence ends) or write new details.
@@ -138,18 +209,37 @@ where we calculate weights for $\mathbf{W}_{hh}$ ($H\times H$), weights for $\ma
 
 An **LSTM** layer performs four linear transformations:
 $$\text{Params}_{\text{LSTM}} = 4 \times H \times (H + D + 1)$$
+
 For each of the four components ($f$, $i$, $c$, $o$), we must learn a weight matrix and a bias vector.
 
-```
-        LSTM Layer Parameters (4x bigger than Vanilla RNN)
-        
-        [ Forget Gate weights: W_f, U_f, b_f ] - H x (H + D + 1)
-        [ Input Gate weights:  W_i, U_i, b_i ] - H x (H + D + 1)
-        [ Candidate weights:   W_c, U_c, b_c ] - H x (H + D + 1)
-        [ Output Gate weights: W_o, U_o, b_o ] - H x (H + D + 1)
-```
-
 This four-fold increase in parameter count has a direct impact on optimization. LSTMs have a high representational capacity, meaning they require larger datasets to train without overfitting. Additionally, the training loop is slower and uses more GPU memory.
+
+### Python Code Implementation
+Here is a Python script using Keras to count and compare the parameters of a SimpleRNN layer vs. an LSTM layer with identical dimensions, verifying the $4\times$ multiplier:
+
+```python
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+H = 64
+D = 10
+
+# Initialize SimpleRNN layer
+rnn_layer = layers.SimpleRNN(units=H, input_shape=(None, D))
+# Initialize LSTM layer
+lstm_layer = layers.LSTM(units=H, input_shape=(None, D))
+
+# Build layers with dummy data to construct weights
+dummy_input = tf.zeros((1, 5, D))
+_ = rnn_layer(dummy_input)
+_ = lstm_layer(dummy_input)
+
+print(f"--- Parameter Comparison (H={H}, D={D}) ---")
+print(f"SimpleRNN Param Count: {rnn_layer.count_params():,}")
+print(f"LSTM Param Count:      {lstm_layer.count_params():,}")
+print(f"Ratio (LSTM/SimpleRNN): {lstm_layer.count_params() / rnn_layer.count_params():.1f}x")
+```
 
 ### Trade-offs
 - **Advantages:** The high capacity allows LSTMs to capture complex patterns in time-series and NLP datasets that smaller models miss.

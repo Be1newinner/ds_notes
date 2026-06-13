@@ -27,18 +27,67 @@ Under the hood, at each timestep $t$:
 4. **Update Hidden State ($\mathbf{h}_t$):** The new hidden state is calculated as a linear interpolation between the past state and the candidate state, controlled by the update gate $\mathbf{z}_t$:
    $$\mathbf{h}_t = (1 - \mathbf{z}_t) \odot \mathbf{h}_{t-1} + \mathbf{z}_t \odot \tilde{\mathbf{h}}_t$$
 
-```
-                 h_t-1 ------------[ (1 - z_t) ] ----------------> [  +  ] ---> h_t
-                   |                      ^                         ^
-                   |                      |                         | z_t * h~_t
-                   +---> [ Reset Gate r_t ] ---> [ Candidate h~_t ]-/
-                   |
-       x_t --------+---> [ Update Gate z_t ]
-```
-
 Because a GRU only has 3 internal sub-layers (compared to 4 in an LSTM), the parameter count is significantly reduced:
 $$\text{Parameters}_{\text{GRU}} = 3 \times H \times (H + D + 1)$$
 where $H$ is the hidden state size and $D$ is the input feature dimension.
+
+### Python Code Implementation
+Here is a Python function implementing a single forward pass of a GRU cell from scratch using NumPy, showing how the update and reset gates control the state transitions:
+
+```python
+import numpy as np
+
+def sigmoid(z):
+    return 1.0 / (1.0 + np.exp(-z))
+
+def gru_cell_forward(x_t, h_prev, weights, biases):
+    # Unpack weights and biases
+    W_z, W_r, W_h = weights
+    b_z, b_r, b_h = biases
+    
+    # Concatenate inputs
+    concat = np.concatenate([h_prev, x_t])
+    
+    # 1. Update Gate (z_t)
+    z_t = sigmoid(np.dot(W_z, concat) + b_z)
+    
+    # 2. Reset Gate (r_t)
+    r_t = sigmoid(np.dot(W_r, concat) + b_r)
+    
+    # 3. Candidate Hidden State (h_tilde)
+    # The reset gate scales the previous hidden state
+    gated_h_prev = r_t * h_prev
+    concat_candidate = np.concatenate([gated_h_prev, x_t])
+    h_tilde = np.tanh(np.dot(W_h, concat_candidate) + b_h)
+    
+    # 4. Final Hidden State update
+    h_t = (1.0 - z_t) * h_prev + z_t * h_tilde
+    
+    return h_t, (z_t, r_t, h_tilde)
+
+# Setup shapes: Input D=2, Hidden H=3
+D = 2
+H = 3
+
+# Initialize parameters randomly
+np.random.seed(42)
+weights = [np.random.randn(H, H + D) for _ in range(3)]
+biases = [np.zeros(H) for _ in range(3)]
+
+# Inputs
+x_t = np.array([1.5, -0.2])
+h_prev = np.array([0.5, 0.5, 0.5])
+
+# Forward step
+h_t, gates = gru_cell_forward(x_t, h_prev, weights, biases)
+z_t, r_t, h_tilde = gates
+
+print("--- GRU Gate Activations ---")
+print("Update Gate (z_t):", np.round(z_t, 4))
+print("Reset Gate  (r_t):", np.round(r_t, 4))
+print("\n--- Updated Hidden State ---")
+print("New Hidden State (h_t):", np.round(h_t, 4))
+```
 
 ### Trade-offs
 - **Advantages:** GRUs require $25\%$ fewer parameters than LSTMs, leading to faster training times, lower memory consumption, and a reduced risk of overfitting on small datasets.
@@ -81,18 +130,54 @@ In computer vision, 2D convolutions slide a kernel across height and width to ex
 Under the hood, let the input sequence $X$ have shape $(T, D)$ (Timesteps, Features). A 1D kernel $K$ of size $k$ has shape $(k, D)$. The convolution operation at timestep $t$ calculates the dot product across the window:
 $$Z(t) = \sum_{m=1}^k \sum_{d=1}^D X(t + m - 1, d) K(m, d) + b$$
 
-```
-       Input Sequence (T=6, D=3)               1D Kernel (k=3, D=3)      Output (T=4)
-       
-       [ x_11  x_12  x_13 ] - t1               [ w_11  w_12  w_13 ]       
-       [ x_21  x_22  x_23 ] - t2   * Conv1D    [ w_21  w_22  w_23 ]  ===> [ z_1 ] - t1
-       [ x_31  x_32  x_33 ] - t3               [ w_31  w_32  w_33 ]       [ z_2 ] - t2
-       [ x_41  x_42  x_43 ] - t4                                          [ z_3 ] - t3
-       [ x_51  x_52  x_53 ] - t5                                          [ z_4 ] - t4
-       [ x_61  x_62  x_63 ] - t6
-```
-
 Crucially, **Conv1D avoids the sequential bottleneck**. Unlike RNNs, which must calculate steps one-by-one ($\mathbf{h}_{t-1} \to \mathbf{h}_t$), Conv1D calculates the outputs at all timesteps in parallel. There are no temporal state dependencies in the forward pass, allowing GPUs to parallelize the operations and train models orders of magnitude faster than RNNs.
+
+### Python Code Implementation
+Here is a Python function implementing a 1D convolution operation from scratch using NumPy, showing how a temporal kernel slides along sequence timesteps to extract local patterns:
+
+```python
+import numpy as np
+
+def convolve1d(sequence, kernel, bias=0.0):
+    seq_len, num_features = sequence.shape
+    k_size, _ = kernel.shape
+    
+    # Output length with Valid padding (P=0) and Stride=1
+    out_len = seq_len - k_size + 1
+    output = np.zeros(out_len)
+    
+    # Perform sliding window convolution
+    for t in range(out_len):
+        # Extract sequence patch matching the kernel size
+        patch = sequence[t : t + k_size, :]
+        # Element-wise multiply and sum
+        output[t] = np.sum(patch * kernel) + bias
+        
+    return output
+
+# Synthetic sequence of length T=6, features D=2
+# Representing closing price and volume indicators
+sequence = np.array([
+    [100.0, 1.0],
+    [102.0, 1.2],
+    [101.0, 0.9],
+    [104.0, 1.5],
+    [105.0, 1.6],
+    [103.0, 1.1]
+])
+
+# 1D kernel of size k=3, D=2
+kernel = np.array([
+    [0.1, 0.5],
+    [0.2, 0.5],
+    [0.7, 1.0]
+])
+
+out = convolve1d(sequence, kernel)
+print("Input Sequence:\n", sequence)
+print("\nKernel:\n", kernel)
+print("\n1D Convolution Output Feature Map:", out)
+```
 
 ### Trade-offs
 - **Advantages:** Extremely fast training speeds and excellent extraction of local temporal features (e.g., 3-day stock price dips, audio wave patterns).
@@ -146,14 +231,43 @@ Under the hood:
    keras.layers.GRU(32)
    ```
 
-```
-       Input (B, 100, D) ---> [ Conv1D (strides=2) ] ---> (B, 50, 64) ---> [ GRU ] ---> Output (B, 32)
-                                      |                                      |
-                              Local Extraction &                       Long-Term Context
-                                 Downsampling                             Modeling
-```
-
 By reducing the sequence length from $T$ to $T/2$, we halve the number of unrolled timesteps that the GRU has to process, speeding up BPTT and reducing memory consumption by $50\%$.
+
+### Python Code Implementation
+Here is a Python script using Keras to design a Hybrid Conv1D-GRU model and inspect how the shapes of tensors transition across the network:
+
+```python
+import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
+# Design the Hybrid model
+model = keras.Sequential([
+    layers.Input(shape=(200, 10), name='input_sequence'),  # 200 steps, 10 features
+    layers.Conv1D(
+        filters=32, 
+        kernel_size=3, 
+        strides=2, 
+        padding='same', 
+        activation='relu', 
+        name='conv1d_compressor'
+    ),
+    layers.GRU(16, return_sequences=False, name='gru_summarizer'),
+    layers.Dense(1, name='prediction')
+])
+
+# Verify output shapes at each stage of the network
+print("--- Hybrid Model Summary ---")
+model.summary()
+
+# Trace a dummy batch through the model layers
+dummy_batch = tf.random.normal((1, 200, 10))
+print("\n--- Layer Output Shapes Trace ---")
+x = dummy_input = dummy_batch
+for layer in model.layers:
+    x = layer(x)
+    print(f"Layer: {layer.name:20s} | Output Shape: {x.shape}")
+```
 
 ### Trade-offs
 - **Advantages:** Best of both worlds: Conv1D extracts clean local features and shrinks the sequence, while the RNN tracks long-term context over the compressed sequence.

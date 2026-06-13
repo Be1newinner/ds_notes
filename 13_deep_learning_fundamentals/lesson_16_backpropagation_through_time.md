@@ -15,18 +15,6 @@ While BPTT is mathematically elegant, it exposes a fundamental flaw in Vanilla R
 ### Rationale and Mechanics
 To calculate gradients in an RNN, we must map its temporal loops to a static structure. We achieve this by **Unrolling** (or unfolding) the computational graph. An unrolled RNN is a feedforward network where the number of layers corresponds to the sequence length $T$.
 
-```
-       Recurrent Representation:                  Unrolled Representation:
-       
-                                             y_1           y_2           y_T
-                                              ^             ^             ^
-                                              |             |             |
-            [ RNN Layer ] <----\        h_0 ->[ h_1 ]------->[ h_2 ]------->[ h_T ]
-              ^              |                ^             ^             ^
-              |              |                |             |             |
-             x_t ------------/               x_1           x_2           x_T
-```
-
 Once the graph is unrolled, we calculate gradients using **Backpropagation Through Time (BPTT)**. Let's analyze the math.
 
 Under the hood, let the total loss over the sequence be the sum of losses at each timestep:
@@ -42,6 +30,60 @@ The middle term $\frac{\partial \mathbf{h}_t}{\partial \mathbf{h}_k}$ measures h
 $$\frac{\partial \mathbf{h}_t}{\partial \mathbf{h}_k} = \prod_{j=k+1}^t \frac{\partial \mathbf{h}_j}{\partial \mathbf{h}_{j-1}}$$
 
 This product of Jacobians is the source of the optimization problems in recurrent networks.
+
+### Python Code Implementation
+Here is a Python script simulating how gradients are computed in an unrolled sequence of length $T=3$, showing how contributions at each timestep are summed to compute the final gradient:
+
+```python
+import numpy as np
+
+# Simulate hidden state activations (H=2) for T=3 steps
+h = [
+    np.array([0.0, 0.0]),     # h_0
+    np.array([0.5, -0.2]),    # h_1
+    np.array([0.8, -0.5]),    # h_2
+    np.array([0.9, -0.7])     # h_3
+]
+
+# Recurrent weights matrix W_hh (shape 2x2)
+W_hh = np.array([
+    [0.8, 0.1],
+    [-0.2, 0.7]
+])
+
+# Assume some gradients of the loss w.r.t the final hidden states (dL/dh_t)
+dL_dh = [
+    None,                     # t=0
+    np.array([0.1, 0.05]),    # dL/dh_1
+    np.array([0.2, 0.1]),     # dL/dh_2
+    np.array([0.5, 0.3])      # dL/dh_3
+]
+
+# Jacobian of h_j w.r.t h_j-1 is approximately W_hh^T (linear approximation for demo)
+def get_jacobian():
+    return W_hh.T
+
+# Summing gradients over time (T=3)
+dL_dWhh = np.zeros_like(W_hh)
+
+# Backpropagate through timesteps
+for t in [1, 2, 3]:
+    # Calculate dL_t / dW_hh using chain rule
+    # For simplicity, let's trace step 3:
+    if t == 3:
+        # Step 3 -> k=3: dL3/dh3 * dh3/dWhh
+        grad_3 = np.outer(dL_dh[3], h[2]) # Outer product representing dL3/dWhh at step 3
+        # Step 3 -> k=2: dL3/dh3 * dh3/dh2 * dh2/dWhh
+        jacobian_3_2 = get_jacobian()
+        grad_2 = np.outer(np.dot(dL_dh[3], jacobian_3_2), h[1])
+        # Step 3 -> k=1: dL3/dh3 * dh3/dh2 * dh2/dh1 * dh1/dWhh
+        jacobian_2_1 = get_jacobian()
+        grad_1 = np.outer(np.dot(np.dot(dL_dh[3], jacobian_3_2), jacobian_2_1), h[0])
+        
+        dL_dWhh += (grad_3 + grad_2 + grad_1)
+
+print("Summed gradient matrix dL/dWhh:\n", dL_dWhh)
+```
 
 ### Trade-offs
 BPTT calculates the exact analytical gradients for all shared weights.
@@ -88,15 +130,43 @@ Let the largest eigenvalue (spectral radius) of the weight matrix $\mathbf{W}_{h
 - **Vanishing Gradients ($\lambda_{\text{max}} < 1$):** Since the derivative of Tanh is bounded by $1.0$ ($\|1 - \mathbf{h}_j^2\| \le 1.0$), if the largest eigenvalue of the weight matrix is less than 1, the product will decay exponentially toward zero as the temporal distance $t - k$ increases. The gradient vanishes, meaning the loss at timestep $t$ cannot update the weights for inputs at early timestep $k$.
 - **Exploding Gradients ($\lambda_{\text{max}} > 1$):** If the largest eigenvalue is greater than 1, and the activations are in their linear regions (so the Tanh derivative is close to 1.0), the product will grow exponentially, causing the gradients to explode to infinity.
 
-```
-       Temporal Distance (t - k): 1 -------> 10 -------> 50 -------> 100
-       
-       Vanishing Gradient (0.9^d): 0.9 ------> 0.34 -----> 0.005 ----> 0.00002 (Signal lost)
-       
-       Exploding Gradient (1.1^d): 1.1 ------> 2.59 -----> 117.3 ----> 13780.6 (Numerical overflow)
-```
-
 In Vanilla RNNs, vanishing gradients are the dominant failure mode. This math proves that Vanilla RNNs cannot capture dependencies longer than 10 to 20 timesteps: the network is mathematically incapable of retaining long-term memory.
+
+### Python Code Implementation
+Here is a Python script simulating the repeated multiplication of Jacobian matrices, showing how the spectral radius (largest eigenvalue) causes the gradient magnitude to either decay to zero or explode to infinity:
+
+```python
+import numpy as np
+
+def simulate_jacobian_product(spectral_radius, timesteps=30):
+    # Create a random 2x2 matrix
+    np.random.seed(42)
+    W = np.random.randn(2, 2)
+    # Scale matrix to have the exact desired spectral radius
+    eigenvalues = np.linalg.eigvals(W)
+    W = W * (spectral_radius / np.max(np.abs(eigenvalues)))
+    
+    # Initial error gradient vector arriving from output
+    grad = np.array([1.0, 1.0])
+    norms = []
+    
+    # Simulate backpropagation through time steps
+    for step in range(timesteps):
+        grad = np.dot(W.T, grad)  # Propagate backward
+        norms.append(np.linalg.norm(grad))
+        
+    return norms
+
+# Run simulations
+vanishing_norms = simulate_jacobian_product(spectral_radius=0.85, timesteps=10)
+exploding_norms = simulate_jacobian_product(spectral_radius=1.25, timesteps=10)
+
+print("--- Gradient Magnitude Trajectory Over 10 Steps ---")
+print("Step | Spectral Radius = 0.85 | Spectral Radius = 1.25")
+print("-----------------------------------------------------")
+for step in range(10):
+    print(f"{step+1:4d} | {vanishing_norms[step]:21.4f} | {exploding_norms[step]:21.4f}")
+```
 
 ### Trade-offs
 The vanishing gradient problem is a systemic flaw of the Vanilla RNN architecture. No amount of regularization or learning rate tuning can solve it because the decay is built into the matrix multiplication. To solve vanishing gradients, we must change the architecture, transitioning to gated cells like LSTMs or GRUs.
@@ -136,20 +206,42 @@ There are two primary methods for gradient clipping:
 2. **Clip by Norm (Global Clipping):** We calculate the Euclidean norm (length) of the entire gradient vector: $\|\mathbf{g}\| = \sqrt{\sum_i g_i^2}$. If the norm exceeds a threshold $c$, we scale the entire vector:
    $$\mathbf{g} \leftarrow c \times \frac{\mathbf{g}}{\|\mathbf{g}\|}$$
 
-```
-                          Clip by Norm: Preserves Direction
-                          
-                                 y
-                                 ^       / (Original Gradient vector)
-                                 |     / 
-                                 |   /   
-                                 | /     (Clipped Vector: same angle,
-                                 +----->   shorter length)
-                                 |
-                                 +------------------------> x
-```
-
 Clip by Norm is preferred because it preserves the **direction** of the gradient vector in parameter space, only scaling down the step size. Clip by Value changes the direction of the vector because it clips some coordinates while leaving others unchanged.
+
+### Python Code Implementation
+Here is a Python script implementing both Clip-by-Value and Clip-by-Norm, demonstrating how Clip-by-Norm preserves the vector direction (cosine similarity of 1.0) while Clip-by-Value alters the update direction:
+
+```python
+import numpy as np
+
+def clip_by_value(grad, threshold):
+    return np.clip(grad, -threshold, threshold)
+
+def clip_by_norm(grad, threshold):
+    norm = np.linalg.norm(grad)
+    if norm > threshold:
+        return threshold * (grad / norm)
+    return grad
+
+def cosine_similarity(v1, v2):
+    return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+
+# Simulate an exploding gradient vector
+grad = np.array([12.0, 0.5, -8.0])
+threshold = 3.0
+
+clipped_val = clip_by_value(grad, threshold)
+clipped_norm = clip_by_norm(grad, threshold)
+
+print("Original Gradient:     ", grad)
+print("Clipped by Value:      ", clipped_val)
+print("Clipped by Norm:       ", np.round(clipped_norm, 4))
+
+# Compute directions
+print(f"\nCosine Similarity (Original vs Value): {cosine_similarity(grad, clipped_val):.6f}")
+print(f"Cosine Similarity (Original vs Norm) : {cosine_similarity(grad, clipped_norm):.6f}")
+# Cosine similarity of 1.0 indicates identical directions!
+```
 
 ### Trade-offs
 - **Advantages:** Gradient clipping is simple, computationally cheap, and highly effective at preventing exploding gradients. It ensures training stability even in very deep recurrent networks.
