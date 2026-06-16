@@ -14,13 +14,12 @@ Gradient Descent is the algorithm that makes "Learning" possible. We move from h
 
 Imagine you are blindfolded at the top of a rugged, foggy mountain, and your goal is to reach the lowest point in the valley. Since you cannot see the overall landscape, you check the slope of the ground directly beneath your feet. You take a step in the direction where the ground descends the steepest. By repeating this process iteratively, you gradually work your way down to the bottom.
 
-In Deep Learning, the **mountain landscape** represents the *Loss Function* (the error of our neural network), your **current coordinates** represent the network's *Weights and Biases*, and the **steepest downward slope** is found using the negative of the *Gradient*.
+In Deep Learning, the **mountain landscape** represents the _Loss Function_ (the error of our neural network), your **current coordinates** represent the network's _Weights and Biases_, and the **steepest downward slope** is found using the negative of the _Gradient_.
 
 ### 2. The Mathematical Engine
 
 Mathematically, a gradient is a vector containing all the partial derivatives of the loss function with respect to each parameter. The update rule for any single parameter w is defined as:
-`
-                               wnew = wold - η · (∂L / ∂w)
+`                                wnew = wold - η · (∂L / ∂w)
                            `
 w (Weight) The learnable parameter we want to optimize to minimize error.
 η (Learning Rate) A hyperparameter controlling the step size. Too high causes divergence; too low causes slow training.
@@ -33,25 +32,25 @@ The derivative (gradient) with respect to w is: `dL/dw = 2w`.
 Assume we start at an initial weight `w₀ = 4` with a learning rate `η = 0.1`.
 Iteration 1 Loss = 16.0
 
-* • Current Weight: w₀ = 4
+- • Current Weight: w₀ = 4
 
-* • Gradient: dL/dw = 2 × 4 = 8
+- • Gradient: dL/dw = 2 × 4 = 8
 
-* • Update: w₁ = 4 - (0.1 × 8) = 3.2
-Iteration 2 Loss = 10.24
+- • Update: w₁ = 4 - (0.1 × 8) = 3.2
+  Iteration 2 Loss = 10.24
 
-* • Current Weight: w₁ = 3.2
+- • Current Weight: w₁ = 3.2
 
-* • Gradient: dL/dw = 2 × 3.2 = 6.4
+- • Gradient: dL/dw = 2 × 3.2 = 6.4
 
-* • Update: w₂ = 3.2 - (0.1 × 6.4) = 2.56
-Iteration 3 Loss = 6.55
+- • Update: w₂ = 3.2 - (0.1 × 6.4) = 2.56
+  Iteration 3 Loss = 6.55
 
-* • Current Weight: w₂ = 2.56
+- • Current Weight: w₂ = 2.56
 
-* • Gradient: dL/dw = 2 × 2.56 = 5.12
+- • Gradient: dL/dw = 2 × 2.56 = 5.12
 
-* • Update: w₃ = 2.56 - (0.1 × 5.12) = 2.048
+- • Update: w₃ = 2.56 - (0.1 × 5.12) = 2.048
 
 Notice how the weight steadily approaches the optimal value of 0, and the loss decreases at each step. As the slope becomes flatter near the minimum, the updates automatically become smaller, ensuring smooth convergence.
 
@@ -90,19 +89,37 @@ prediction_function(.47, 1)
 
 # Test the prediction function with another sample pair (0.18 for age, 1 for affordability)
 prediction_function(.18, 1)
+import numpy as np
 
-# Define a function to compute binary crossentropy loss (log loss) between actual and predicted vectors
-def log_loss(y_true, y_predicted):
-   # Set a tiny epsilon value to avoid calculating log(0)
-   epsilon = 1e-15
-   # Replace any value smaller than epsilon in predictions with epsilon
-   y_predicted_new = [max(i,epsilon) for i in y_predicted]
-   # Replace any value larger than 1-epsilon in predictions with 1-epsilon
-   y_predicted_new = [min(i,1-epsilon) for i in y_predicted_new]
-   # Convert the clipped predictions list into a NumPy array for vectorized math
-   y_predicted_new = np.array(y_predicted_new)
-   # Calculate and return the average binary crossentropy loss across all predictions
-   return -np.mean(y_true*np.log(y_predicted_new)+(1-y_true)*np.log(1-y_predicted_new))
+def calculate_log_loss(y_true, y_pred):
+    """
+    Computes the Binary Cross-Entropy / Log Loss.
+    """
+    # 1. Convert to NumPy arrays for optimized vectorized operations
+    y_true = np.array(y_true)
+    y_pred = np.array(y_pred)
+
+    # 2. Define epsilon to prevent mathematical boundaries (log(0))
+    epsilon = 1e-15
+
+    # 3. Clip predictions strictly between 0.000...01 and 0.999...99
+    y_pred = np.clip(y_pred, epsilon, 1 - epsilon)
+
+    # 4. Calculate the element-wise penalty using our formula
+    # Note: np.log calculates the natural logarithm (base e)
+    penalties = - (y_true * np.log(y_pred) + (1 - y_true) * np.log(1 - y_pred))
+
+    # 5. Aggregate by taking the mean across the batch
+    return np.mean(penalties)
+
+# --- Example Application ---
+true_labels = [1, 0, 1, 1]
+
+# In this batch, the last prediction (0.05) is very confident but very wrong.
+predicted_probs = [0.95, 0.10, 0.80, 0.05]
+
+loss = calculate_log_loss(true_labels, predicted_probs)
+print(f"Total Log Loss: {loss:.4f}")
 
 # Define a function to compute sigmoid element-wise on a NumPy array
 def sigmoid_numpy(X):
@@ -166,20 +183,18 @@ def gradient_descent(age, affordability, y_true, epochs, loss_thresold):
 
 Recall the blindfolded hiker trying to find the valley. The **Learning Rate** ($\eta$) controls how large of a step the hiker takes:
 
-* **If the step size ($\eta$) is too small (e.g., $0.00001$)**:
+- **If the step size ($\eta$) is too small (e.g., $0.00001$)**:
   The hiker takes tiny, baby steps. They will eventually reach the bottom, but it might take them days. In code, your training will take forever (slow convergence).
-  
-* **If the step size ($\eta$) is too large (e.g., $10.0$)**:
+- **If the step size ($\eta$) is too large (e.g., $10.0$)**:
   The hiker takes massive leaps. They might leap right over the valley and end up on a higher peak on the other side. This is called **divergence**—the loss will start increasing or bounce back and forth wildly, and the network will never learn.
-  
-* **The Sweet Spot (typically between $0.001$ and $0.1$)**:
+- **The Sweet Spot (typically between $0.001$ and $0.1$)**:
   Allows the hiker to take steady, reasonable steps that converge efficiently to the lowest point.
 
 ---
 
 ### 💡 Supplementary Notes
 
-* **Saddle Points vs. Local Minima**: In high-dimensional optimization landscapes of deep neural networks, local minima are rare. The optimizer is much more likely to encounter **saddle points**, where the gradient is zero but eigenvalues of the Hessian have mixed signs.
+- **Saddle Points vs. Local Minima**: In high-dimensional optimization landscapes of deep neural networks, local minima are rare. The optimizer is much more likely to encounter **saddle points**, where the gradient is zero but eigenvalues of the Hessian have mixed signs.
 
 ## Active Recall Checkpoint
 
